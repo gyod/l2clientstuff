@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import java.util.zip.InflaterInputStream;
 
 /**
+ * Thanks Hint for algorithm and keys.
  *
  * @author acmi
  */

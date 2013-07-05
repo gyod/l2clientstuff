@@ -12,10 +12,10 @@ import java.nio.charset.Charset;
 /**
  * @author acmi
  */
-public class L2InputStream extends InputStream implements DataInput{
+public class L2DataInputStream extends InputStream implements DataInput{
     private InputStream input;
 
-    public L2InputStream(InputStream input) {
+    public L2DataInputStream(InputStream input) {
         this.input = input;
     }
 
