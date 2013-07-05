@@ -75,11 +75,10 @@ public class L2FileInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        if (got == size)
-            throw new EOFException();
+        int b = inflaterInputStream.read();
+        if (got < size) got++;
 
-        got++;
-        return inflaterInputStream.read();
+        return b;
     }
 
     @Override
@@ -137,7 +136,7 @@ public class L2FileInputStream extends InputStream {
 
             int size = block.get() & 0xff;
             if (size > 124)
-                throw new IOException("block data size too big");
+                throw new IOException("block data size too large");
 
             int p = block.capacity() - size;
             while (p > 1 && block.array()[p - 1] != '\0') p--;
