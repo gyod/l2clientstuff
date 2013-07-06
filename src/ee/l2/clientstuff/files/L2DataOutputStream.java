@@ -1,7 +1,11 @@
 package ee.l2.clientstuff.files;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * @author acmi
@@ -215,8 +219,8 @@ public class L2DataOutputStream extends OutputStream implements DataOutput {
                             arrField.setAccessible(true);
                             int lenExpected = Array.getLength(arrField.get(obj)) + lenAnn.add();
                             if (lenExpected != len)
-                                throw new IOException(clazz.getSimpleName()+"."+field.getName()+": length expected " + lenExpected + ", got" + len);
-                        }else
+                                throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": length expected " + lenExpected + ", got" + len);
+                        } else
                             len += lenAnn.add();
 
                         LengthType lenType = lenAnn.lengthType();
@@ -231,17 +235,17 @@ public class L2DataOutputStream extends OutputStream implements DataOutput {
                 } else
                     writeInt(len);
 
-                for (int i=0; i<len; i++){
-                    if (field.getType().getComponentType() == String.class){
+                for (int i = 0; i < len; i++) {
+                    if (field.getType().getComponentType() == String.class) {
                         if (field.isAnnotationPresent(Unicode.class))
                             writeUTF(Array.get(array, i).toString());
                         else
                             writeLine(Array.get(array, i).toString());
-                    }else if (field.isAnnotationPresent(Compact.class) &&
+                    } else if (field.isAnnotationPresent(Compact.class) &&
                             (field.getType().getComponentType() == Integer.class ||
-                                    field.getType().getComponentType() == Integer.TYPE)){
-                        writeCompactInt((int)Array.get(array, i));
-                    }else
+                                    field.getType().getComponentType() == Integer.TYPE)) {
+                        writeCompactInt((Integer) Array.get(array, i));
+                    } else
                         writeObject(Array.get(array, i));
                 }
             } else {
@@ -261,7 +265,7 @@ public class L2DataOutputStream extends OutputStream implements DataOutput {
 
                     IntConst intConst = field.getAnnotation(IntConst.class);
                     if (intConst != null && val != intConst.value())
-                        throw new IOException(clazz.getSimpleName()+"."+field.getName()+": IntConst expected " + intConst.value() + ", got" + val);
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": IntConst expected " + intConst.value() + ", got" + val);
 
                     writeShort(field.getShort(obj));
                 } else if (field.getType() == Character.TYPE) {
@@ -277,7 +281,7 @@ public class L2DataOutputStream extends OutputStream implements DataOutput {
 
                     IntConst intConst = field.getAnnotation(IntConst.class);
                     if (intConst != null && val != intConst.value())
-                        throw new IOException(clazz.getSimpleName()+"."+field.getName()+": IntConst expected " + intConst.value() + ", got" + val);
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": IntConst expected " + intConst.value() + ", got" + val);
 
                     if (field.isAnnotationPresent(Compact.class))
                         writeCompactInt(field.getInt(obj));
@@ -295,7 +299,7 @@ public class L2DataOutputStream extends OutputStream implements DataOutput {
 
                     StringConst stringConst = field.getAnnotation(StringConst.class);
                     if (stringConst != null && !val.equals(stringConst.value()))
-                        throw new IOException(clazz.getSimpleName()+"."+field.getName()+": StringConst expected " + stringConst.value() + ", got" + val);
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": StringConst expected " + stringConst.value() + ", got" + val);
 
                     if (field.isAnnotationPresent(Unicode.class))
                         writeUTF(field.get(obj).toString());
