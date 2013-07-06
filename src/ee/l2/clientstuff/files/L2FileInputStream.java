@@ -19,7 +19,7 @@ import java.util.zip.InflaterInputStream;
  * @author acmi
  */
 public class L2FileInputStream extends InputStream {
-    public final static BigInteger EXPONENT_ORIGINAL = new BigInteger("35", 16);
+    public final static BigInteger PRIVATE_EXPONENT_ORIGINAL = new BigInteger("35", 16);
     public final static BigInteger MODULUS_ORIGINAL = new BigInteger(
             "97df398472ddf737ef0a0cd17e8d172f" +
                     "0fef1661a38a8ae1d6e829bc1c6e4c3c" +
@@ -30,7 +30,7 @@ public class L2FileInputStream extends InputStream {
                     "50e68f7867b6749314d40511d09bc574" +
                     "4551baa86a89dc38123dc1668fd72d83", 16);
 
-    public final static BigInteger EXPONENT_L2ENCDEC = new BigInteger("1d", 16);
+    public final static BigInteger PRIVATE_EXPONENT_L2ENCDEC = new BigInteger("1d", 16);
     public final static BigInteger MODULUS_L2ENCDEC = new BigInteger(
             "75b4d6de5c016544068a1acf125869f4" +
                     "3d2e09fc55b8b1e289556daf9b875763" +
@@ -41,7 +41,7 @@ public class L2FileInputStream extends InputStream {
                     "707af1d2108881abb567c3b3d069ae67" +
                     "c3a4c6a3aa93d26413d4c66094ae2039", 16);
 
-    private InflaterInputStream inflaterInputStream;
+    private InputStream stream;
     private int size;
     private int got;
 
@@ -58,11 +58,11 @@ public class L2FileInputStream extends InputStream {
         DataInputStream dataInputStream = new DataInputStream(cipherInputStream);
         size = Integer.reverseBytes(dataInputStream.readInt());  //Little endian
 
-        inflaterInputStream = new InflaterInputStream(cipherInputStream);
+        stream = new InflaterInputStream(cipherInputStream);
     }
 
     public L2FileInputStream(InputStream input) throws IOException, GeneralSecurityException {
-        this(input, MODULUS_ORIGINAL, EXPONENT_ORIGINAL);
+        this(input, MODULUS_ORIGINAL, PRIVATE_EXPONENT_ORIGINAL);
     }
 
     private void readHeader(InputStream input) throws IOException {
@@ -79,7 +79,7 @@ public class L2FileInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        int b = inflaterInputStream.read();
+        int b = stream.read();
         if (got < size) got++;
 
         return b;
@@ -92,7 +92,7 @@ public class L2FileInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        inflaterInputStream.close();
+        stream.close();
     }
 
     public static class CipherInputStream extends InputStream {
@@ -126,7 +126,7 @@ public class L2FileInputStream extends InputStream {
 
         private void fillBuffer() throws IOException {
             input.read(readBuffer);
-            ByteBuffer block = null;
+            ByteBuffer block;
             try {
                 block = ByteBuffer.wrap(cipher.doFinal(readBuffer), 3, 125);
             } catch (GeneralSecurityException | IndexOutOfBoundsException e) {
