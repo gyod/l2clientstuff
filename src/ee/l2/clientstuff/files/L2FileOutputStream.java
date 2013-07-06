@@ -1,6 +1,7 @@
 package ee.l2.clientstuff.files;
 
 import ee.l2.clientstuff.files.crypt.L2Ver111OutputStream;
+import ee.l2.clientstuff.files.crypt.L2Ver120OutputStream;
 import ee.l2.clientstuff.files.crypt.L2Ver121OutputStream;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class L2FileOutputStream extends OutputStream {
             case 111:
                 return new L2Ver111OutputStream(output);
             case 120:
-                new RuntimeException("Not supported yet");
+                return new L2Ver120OutputStream(output);
             case 121:
                 return new L2Ver121OutputStream(output);
             //BLOWFISH

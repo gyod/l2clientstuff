@@ -1,6 +1,7 @@
 package ee.l2.clientstuff.files;
 
 import ee.l2.clientstuff.files.crypt.L2Ver111InputStream;
+import ee.l2.clientstuff.files.crypt.L2Ver120InputStream;
 import ee.l2.clientstuff.files.crypt.L2Ver121InputStream;
 import ee.l2.clientstuff.files.crypt.L2Ver413InputStream;
 
@@ -33,7 +34,7 @@ public class L2FileInputStream extends InputStream {
             case 111:
                 return new L2Ver111InputStream(input);
             case 120:
-                new RuntimeException("Not supported yet");
+                return new L2Ver120InputStream(input);
             case 121:
                 return new L2Ver121InputStream(input);
             //BLOWFISH
