@@ -6,30 +6,10 @@ import java.io.InputStream;
 /**
  * @author acmi
  */
-public class L2Ver111InputStream extends InputStream {
-    private InputStream input;
+public class L2Ver111InputStream extends XORInputStream {
 
     public L2Ver111InputStream(InputStream input) {
-        this.input = input;
-    }
-
-    @Override
-    public int read() throws IOException {
-        int b = input.read();
-        if (b < 0)
-            return b;
-
-        return b ^ 0xac;
-    }
-
-    @Override
-    public int available() throws IOException {
-        return input.available();
-    }
-
-    @Override
-    public void close() throws IOException {
-        input.close();
+        super(input, new L2Ver111XORKeyGen());
     }
 
     @Override

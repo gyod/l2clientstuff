@@ -37,18 +37,18 @@ public class L2FileOutputStream extends OutputStream {
                 return new L2Ver121OutputStream(output);
             //BLOWFISH
             case 211:
-                new RuntimeException("Not supported yet");
+                throw new RuntimeException("Not supported yet");
             case 212:
-                new RuntimeException("Not supported yet");
-                //RSA
+                throw new RuntimeException("Not supported yet");
+            //RSA
             case 411:
-                new RuntimeException("Not supported yet");
+                throw new RuntimeException("Not supported yet");
             case 412:
-                new RuntimeException("Not supported yet");
+                throw new RuntimeException("Not supported yet");
             case 413:
-                new RuntimeException("Not supported yet");
+                throw new RuntimeException("Not supported yet");
             case 414:
-                new RuntimeException("Not supported yet");
+                throw new RuntimeException("Not supported yet");
             default:
                 throw new RuntimeException("Unsupported version: " + version);
         }
