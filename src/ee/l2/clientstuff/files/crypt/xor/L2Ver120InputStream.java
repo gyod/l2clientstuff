@@ -12,29 +12,33 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package ee.l2.clientstuff.files.dat;
+package ee.l2.clientstuff.files.crypt.xor;
 
-import ee.l2.clientstuff.files.L2DataInputStream;
-
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * @author acmi
  */
-public class L2DatInputStream extends L2DataInputStream{
-    public L2DatInputStream(InputStream input) {
+public class L2Ver120InputStream extends FilterInputStream {
+    private int ind = L2Ver120.INITIAL;
+
+    public L2Ver120InputStream(InputStream input) {
         super(input);
     }
 
     @Override
-    public <T> T readObject(Class<T> clazz) throws IOException, ReflectiveOperationException {
-        T obj = super.readObject(clazz);
+    public int read() throws IOException {
+        int b = in.read();
+        return b < 0 ? b : b ^ L2Ver120.getXORKey(ind++);
+    }
 
-        if (clazz.isAnnotationPresent(SafePackage.class) &&
-                !"SafePackage".equals(readLine()))
-            throw new IOException("\"SafePackage\" expected");
+    @Override
+    public int available() throws IOException {
+        return in.available();
+    }
 
-        return obj;
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 }

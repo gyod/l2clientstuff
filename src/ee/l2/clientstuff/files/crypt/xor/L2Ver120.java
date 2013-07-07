@@ -1,15 +1,29 @@
-package ee.l2.clientstuff.files.crypt;
+/*
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package ee.l2.clientstuff.files.crypt.xor;
 
 /**
  * @author acmi
  */
-public class L2Ver120XORKeyGen implements XORKeyGen {
-    @Override
-    public int getKey(int offset) {
-        offset += 0xE6;
-        int id = (offset >> 8) & 0xff;
-        int i = (offset >> 4) & 0xf;
-        int j = offset & 0xf;
+public class L2Ver120 {
+    public static final int INITIAL = 0xE6;
+
+    public static int getXORKey(int n) {
+        int id = (n >> 8) & 0xff;
+        int i = (n >> 4) & 0xf;
+        int j = n & 0xf;
         return (HELP_TABLE[(id >> 4) & 0xf][i] << 4) | HELP_TABLE[id & 0xf][j];
     }
 

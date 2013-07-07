@@ -12,29 +12,12 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package ee.l2.clientstuff.files.dat;
-
-import ee.l2.clientstuff.files.L2DataInputStream;
-
-import java.io.IOException;
-import java.io.InputStream;
+package ee.l2.clientstuff.files.crypt.blowfish;
 
 /**
  * @author acmi
  */
-public class L2DatInputStream extends L2DataInputStream{
-    public L2DatInputStream(InputStream input) {
-        super(input);
-    }
-
-    @Override
-    public <T> T readObject(Class<T> clazz) throws IOException, ReflectiveOperationException {
-        T obj = super.readObject(clazz);
-
-        if (clazz.isAnnotationPresent(SafePackage.class) &&
-                !"SafePackage".equals(readLine()))
-            throw new IOException("\"SafePackage\" expected");
-
-        return obj;
-    }
+public interface L2Ver21x {
+    public static final byte[] BLOWFISH_KEY_211 = "31==-%&@!^+][;'.]94-\0".getBytes();
+    public static final byte[] BLOWFISH_KEY_212 = "[;'.]94-&@%!^+]-31==\0".getBytes();
 }

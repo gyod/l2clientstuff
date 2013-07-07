@@ -12,29 +12,13 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package ee.l2.clientstuff.files.dat;
+package ee.l2.clientstuff.files;
 
-import ee.l2.clientstuff.files.L2DataInputStream;
-
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * @author acmi
  */
-public class L2DatInputStream extends L2DataInputStream{
-    public L2DatInputStream(InputStream input) {
-        super(input);
-    }
-
-    @Override
-    public <T> T readObject(Class<T> clazz) throws IOException, ReflectiveOperationException {
-        T obj = super.readObject(clazz);
-
-        if (clazz.isAnnotationPresent(SafePackage.class) &&
-                !"SafePackage".equals(readLine()))
-            throw new IOException("\"SafePackage\" expected");
-
-        return obj;
-    }
+public abstract class FinishableOutputStream extends OutputStream{
+    public void finish() throws IOException{}
 }

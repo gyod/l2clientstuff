@@ -1,57 +1,68 @@
+/*
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package ee.l2.clientstuff.files;
 
-import ee.l2.clientstuff.files.crypt.*;
+import ee.l2.clientstuff.files.crypt.blowfish.*;
+import ee.l2.clientstuff.files.crypt.rsa.*;
+import ee.l2.clientstuff.files.crypt.xor.*;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
+
+import static ee.l2.clientstuff.files.crypt.blowfish.L2Ver21xInputStream.*;
+import static ee.l2.clientstuff.files.crypt.xor.L2Ver1x1InputStream.*;
 
 /**
  * @author acmi
  */
 public class L2FileInputStream extends InputStream {
-    private volatile InputStream stream;
+    private InputStream stream;
 
     public L2FileInputStream(InputStream input, boolean l2encdec) throws IOException {
-        try {
-            stream = getInputStream(input, l2encdec);
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        stream = getInputStream(input, l2encdec);
     }
 
-    public L2FileInputStream(InputStream input) throws IOException{
+    public L2FileInputStream(InputStream input) throws IOException {
         this(input, false);
     }
 
-    private InputStream getInputStream(InputStream input, boolean l2encdec) throws Exception {
+    private InputStream getInputStream(InputStream input, boolean l2encdec) throws IOException {
         int version = readVersion(input);
 
         switch (version) {
             //XOR
             case 111:
-                return new L2Ver111InputStream(input);
+            case 121:
+                return new L2Ver1x1InputStream(input, version == 111 ?
+                        XOR_KEY_111 :
+                        XOR_KEY_121);
             case 120:
                 return new L2Ver120InputStream(input);
-            case 121:
-                return new L2Ver121InputStream(input);
             //BLOWFISH
             case 211:
-                return new L2Ver211InputStream(input);
             case 212:
-                return new L2Ver212InputStream(input);
+                return new L2Ver21xInputStream(input, version == 211 ?
+                        BLOWFISH_KEY_211 :
+                        BLOWFISH_KEY_212);
             //RSA
             case 411:
-                throw new RuntimeException("Not supported yet");
             case 412:
-                throw new RuntimeException("Not supported yet");
             case 413:
-                return new L2Ver413InputStream(input, l2encdec);
             case 414:
-                throw new RuntimeException("Not supported yet");
+                return new L2Ver41xInputStream(input, l2encdec);
             default:
                 throw new RuntimeException("Unsupported version: " + version);
         }
@@ -61,14 +72,10 @@ public class L2FileInputStream extends InputStream {
         byte[] header = new byte[28];
         input.read(header);
         String headerStr = new String(header, Charset.forName("utf-16le"));
-        if (!Pattern.compile("Lineage2Ver\\w{3}").matcher(headerStr).matches())
+        if (!Pattern.compile("Lineage2Ver\\d{3}").matcher(headerStr).matches())
             throw new IOException("Not a Lineage 2 file");
 
-        try {
-            return Integer.valueOf(headerStr.substring(11));
-        } catch (NumberFormatException nfe) {
-            throw new IOException("Version must be an 3-digit integer.");
-        }
+        return Integer.valueOf(headerStr.substring(11));
     }
 
     @Override

@@ -1,4 +1,18 @@
-package ee.l2.clientstuff.files.crypt;
+/*
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package ee.l2.clientstuff.files.crypt.rsa;
 
 import javax.crypto.Cipher;
 import java.io.IOException;
@@ -23,6 +37,8 @@ public class RSAInputStream extends InputStream {
         dataBuffer.position(dataBuffer.limit());
     }
 
+    private boolean closed;
+
     public RSAInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException{
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, exponent);
@@ -35,6 +51,9 @@ public class RSAInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
+        if (closed)
+            throw new IOException("Stream closed");
+
         if (dataBuffer.position() == dataBuffer.limit()) {
             if (input.read(readBuffer) != readBuffer.length)
                 return -1;
@@ -46,24 +65,12 @@ public class RSAInputStream extends InputStream {
                 throw new IOException(e);
             }
 
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < 128; i++) {
-                int b = block.array()[i] & 0xff;
-                if (b < 0x10)
-                    sb.append("0");
-                sb.append(Integer.toHexString(b));
-            }
-            System.out.println(sb);
-
             int size = block.get() & 0xff;
             if (size > 124)
                 throw new IOException("block data size too large");
 
-            int p = block.capacity() - size;
-            while (p > 4 && block.array()[p - 1] != '\0') p--;
-
             dataBuffer.clear();
-            dataBuffer.put(block.array(), p, size);
+            dataBuffer.put(block.array(), 128 - size - ((124 - size) % 4), size);
             dataBuffer.flip();
         }
 
@@ -72,6 +79,10 @@ public class RSAInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
+        if (closed)
+            return;
+
+        closed = true;
         input.close();
     }
 }
