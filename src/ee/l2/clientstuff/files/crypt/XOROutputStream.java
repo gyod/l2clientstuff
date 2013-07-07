@@ -18,7 +18,7 @@ public class XOROutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        output.write(b < 0 ? b : b ^ keyGen.getKey(ind++));
+        output.write(b ^ keyGen.getKey(ind++));
     }
 
     @Override

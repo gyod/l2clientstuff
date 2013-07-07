@@ -1,8 +1,6 @@
 package ee.l2.clientstuff.files;
 
-import ee.l2.clientstuff.files.crypt.L2Ver111OutputStream;
-import ee.l2.clientstuff.files.crypt.L2Ver120OutputStream;
-import ee.l2.clientstuff.files.crypt.L2Ver121OutputStream;
+import ee.l2.clientstuff.files.crypt.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,15 +11,25 @@ import java.nio.charset.Charset;
  */
 public class L2FileOutputStream extends OutputStream {
     private OutputStream output;
+    private OutputStream stream;
+    private boolean writeChecksum;
 
-    public L2FileOutputStream(OutputStream output, int version) throws IOException {
+    public L2FileOutputStream(OutputStream output, int version, boolean writeChecksum) throws IOException {
+        this.output = output;
         try {
-            this.output = getOutputStream(output, version);
-        } catch (IOException ioe) {
-            throw ioe;
+            this.stream = getOutputStream(output, version);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        this.writeChecksum = writeChecksum;
+
+        writeHeader(version);
+    }
+
+    private void writeHeader(int version) throws IOException{
+        if (version < 100 || version > 999)
+            throw new IOException("Invalid version "+version);
 
         output.write(("Lineage2Ver" + version).getBytes(Charset.forName("utf-16le")));
     }
@@ -37,9 +45,9 @@ public class L2FileOutputStream extends OutputStream {
                 return new L2Ver121OutputStream(output);
             //BLOWFISH
             case 211:
-                throw new RuntimeException("Not supported yet");
+                return new L2Ver211OutputStream(output);
             case 212:
-                throw new RuntimeException("Not supported yet");
+                return new L2Ver212OutputStream(output);
             //RSA
             case 411:
                 throw new RuntimeException("Not supported yet");
@@ -56,16 +64,22 @@ public class L2FileOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        output.write(b);
+        stream.write(b);
     }
 
     @Override
     public void flush() throws IOException {
-        output.flush();
+        stream.flush();
     }
 
     @Override
     public void close() throws IOException {
+        flush();
+        if (writeChecksum){
+            //TODO
+            for (int i=0; i<20; i++)
+                output.write(0);
+        }
         output.close();
     }
 }

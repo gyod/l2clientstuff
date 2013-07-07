@@ -1,9 +1,6 @@
 package ee.l2.clientstuff.files;
 
-import java.io.DataInput;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -12,41 +9,10 @@ import java.nio.charset.Charset;
 /**
  * @author acmi
  */
-public class L2DataInputStream extends InputStream implements DataInput{
-    private InputStream input;
-
+public class L2DataInputStream extends FilterInputStream implements DataInput{
+    
     public L2DataInputStream(InputStream input) {
-        this.input = input;
-    }
-
-    @Override
-    public int read() throws IOException {
-        return input.read();
-    }
-
-    @Override
-    public int available() throws IOException {
-        return input.available();
-    }
-
-    @Override
-    public void close() throws IOException {
-        input.close();
-    }
-
-    @Override
-    public synchronized void mark(int readlimit) {
-        input.mark(readlimit);
-    }
-
-    @Override
-    public synchronized void reset() throws IOException {
-        input.reset();
-    }
-
-    @Override
-    public boolean markSupported() {
-        return input.markSupported();
+        super(input);
     }
 
     @Override
@@ -60,7 +26,7 @@ public class L2DataInputStream extends InputStream implements DataInput{
             throw new IndexOutOfBoundsException();
         int n = 0;
         while (n < len) {
-            int count = input.read(b, off + n, len - n);
+            int count = in.read(b, off + n, len - n);
             if (count < 0)
                 throw new EOFException();
             n += count;
@@ -72,7 +38,7 @@ public class L2DataInputStream extends InputStream implements DataInput{
         int total = 0;
         int cur;
 
-        while ((total < n) && ((cur = (int) input.skip(n - total)) > 0)) {
+        while ((total < n) && ((cur = (int) in.skip(n - total)) > 0)) {
             total += cur;
         }
 
@@ -91,7 +57,7 @@ public class L2DataInputStream extends InputStream implements DataInput{
 
     @Override
     public byte readByte() throws IOException {
-        int ch = input.read();
+        int ch = in.read();
         if (ch < 0)
             throw new EOFException();
         return (byte) (ch);
@@ -104,8 +70,8 @@ public class L2DataInputStream extends InputStream implements DataInput{
 
     @Override
     public short readShort() throws IOException {
-        int ch1 = input.read();
-        int ch2 = input.read();
+        int ch1 = in.read();
+        int ch2 = in.read();
         if ((ch1 | ch2) < 0)
             throw new EOFException();
         return (short) (ch1 + (ch2 << 8));
@@ -118,8 +84,8 @@ public class L2DataInputStream extends InputStream implements DataInput{
 
     @Override
     public char readChar() throws IOException {
-        int ch1 = input.read();
-        int ch2 = input.read();
+        int ch1 = in.read();
+        int ch2 = in.read();
         if ((ch1 | ch2) < 0)
             throw new EOFException();
         return (char) (ch1 + (ch2 << 8));
@@ -127,10 +93,10 @@ public class L2DataInputStream extends InputStream implements DataInput{
 
     @Override
     public int readInt() throws IOException {
-        int ch1 = input.read();
-        int ch2 = input.read();
-        int ch3 = input.read();
-        int ch4 = input.read();
+        int ch1 = in.read();
+        int ch2 = in.read();
+        int ch3 = in.read();
+        int ch4 = in.read();
         if ((ch1 | ch2 | ch3 | ch4) < 0)
             throw new EOFException();
         return (ch1 + (ch2 << 8) + (ch3 << 16) + (ch4 << 24));
@@ -140,7 +106,7 @@ public class L2DataInputStream extends InputStream implements DataInput{
         int output = 0;
         boolean signed = false;
         for (int i = 0; i < 5; i++) {
-            int x = input.read();
+            int x = in.read();
             if (x < 0)
                 throw new EOFException();
             if (i == 0) {
@@ -166,14 +132,14 @@ public class L2DataInputStream extends InputStream implements DataInput{
 
     @Override
     public long readLong() throws IOException {
-        int ch1 = input.read();
-        int ch2 = input.read();
-        int ch3 = input.read();
-        int ch4 = input.read();
-        int ch5 = input.read();
-        int ch6 = input.read();
-        int ch7 = input.read();
-        int ch8 = input.read();
+        int ch1 = in.read();
+        int ch2 = in.read();
+        int ch3 = in.read();
+        int ch4 = in.read();
+        int ch5 = in.read();
+        int ch6 = in.read();
+        int ch7 = in.read();
+        int ch8 = in.read();
         if ((ch1 | ch2 | ch3 | ch4 | ch5 | ch6 | ch7 | ch8) < 0)
             throw new EOFException();
 
@@ -204,7 +170,7 @@ public class L2DataInputStream extends InputStream implements DataInput{
             return "";
 
         byte[] bytes = new byte[len > 0 ? len : -2 * len];
-        input.read(bytes);
+        in.read(bytes);
         return new String(bytes, 0, bytes.length - (len > 0 ? 1 : 2), Charset.forName(len > 0 ? "ascii" : "utf-16le"));
     }
 
@@ -215,7 +181,7 @@ public class L2DataInputStream extends InputStream implements DataInput{
             return "";
 
         byte[] bytes = new byte[len];
-        input.read(bytes);
+        in.read(bytes);
         return new String(bytes, Charset.forName("utf-16le"));
     }
 

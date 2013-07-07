@@ -1,6 +1,7 @@
 package ee.l2.clientstuff.files;
 
 import java.io.DataOutput;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
@@ -10,26 +11,15 @@ import java.lang.reflect.Modifier;
 /**
  * @author acmi
  */
-public class L2DataOutputStream extends OutputStream implements DataOutput {
-    private OutputStream out;
+public class L2DataOutputStream extends FilterOutputStream implements DataOutput {
 
     public L2DataOutputStream(OutputStream out) {
-        this.out = out;
+        super(out);
     }
 
     @Override
     public void write(int b) throws IOException {
         out.write(b);
-    }
-
-    @Override
-    public void flush() throws IOException {
-        out.flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-        out.close();
     }
 
     @Override

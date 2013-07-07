@@ -1,9 +1,6 @@
 package ee.l2.clientstuff.files;
 
-import ee.l2.clientstuff.files.crypt.L2Ver111InputStream;
-import ee.l2.clientstuff.files.crypt.L2Ver120InputStream;
-import ee.l2.clientstuff.files.crypt.L2Ver121InputStream;
-import ee.l2.clientstuff.files.crypt.L2Ver413InputStream;
+import ee.l2.clientstuff.files.crypt.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,11 +11,11 @@ import java.util.regex.Pattern;
  * @author acmi
  */
 public class L2FileInputStream extends InputStream {
-    private InputStream stream;
+    private volatile InputStream stream;
 
-    public L2FileInputStream(InputStream input) throws IOException {
+    public L2FileInputStream(InputStream input, boolean l2encdec) throws IOException {
         try {
-            stream = getInputStream(input);
+            stream = getInputStream(input, l2encdec);
         } catch (IOException ioe) {
             throw ioe;
         } catch (Exception e) {
@@ -26,7 +23,11 @@ public class L2FileInputStream extends InputStream {
         }
     }
 
-    private InputStream getInputStream(InputStream input) throws Exception {
+    public L2FileInputStream(InputStream input) throws IOException{
+        this(input, false);
+    }
+
+    private InputStream getInputStream(InputStream input, boolean l2encdec) throws Exception {
         int version = readVersion(input);
 
         switch (version) {
@@ -39,16 +40,16 @@ public class L2FileInputStream extends InputStream {
                 return new L2Ver121InputStream(input);
             //BLOWFISH
             case 211:
-                throw new RuntimeException("Not supported yet");
+                return new L2Ver211InputStream(input);
             case 212:
-                throw new RuntimeException("Not supported yet");
+                return new L2Ver212InputStream(input);
             //RSA
             case 411:
                 throw new RuntimeException("Not supported yet");
             case 412:
                 throw new RuntimeException("Not supported yet");
             case 413:
-                return new L2Ver413InputStream(input);
+                return new L2Ver413InputStream(input, l2encdec);
             case 414:
                 throw new RuntimeException("Not supported yet");
             default:
