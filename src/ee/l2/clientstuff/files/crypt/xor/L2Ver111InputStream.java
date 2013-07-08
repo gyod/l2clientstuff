@@ -30,7 +30,7 @@ public class L2Ver111InputStream extends FilterInputStream implements L2Ver111 {
     @Override
     public int read() throws IOException {
         int b = in.read();
-        return b < 0 ? b : b ^ XOR_KEY_111;
+        return b < 0 ? b : b ^ XOR_KEY;
     }
 
     @Override

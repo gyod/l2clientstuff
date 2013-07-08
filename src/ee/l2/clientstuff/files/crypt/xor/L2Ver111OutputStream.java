@@ -31,7 +31,7 @@ public class L2Ver111OutputStream extends FinishableOutputStream implements L2Ve
 
     @Override
     public void write(int b) throws IOException {
-        output.write(b ^ XOR_KEY_111);
+        output.write(b ^ XOR_KEY);
     }
 
     @Override

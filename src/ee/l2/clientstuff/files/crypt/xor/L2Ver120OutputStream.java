@@ -24,7 +24,7 @@ import java.io.OutputStream;
  */
 public class L2Ver120OutputStream extends FinishableOutputStream {
     private OutputStream output;
-    private int ind = L2Ver120.INITIAL;
+    private int ind = L2Ver120.START_IND;
 
     public L2Ver120OutputStream(OutputStream output) {
         this.output = output;

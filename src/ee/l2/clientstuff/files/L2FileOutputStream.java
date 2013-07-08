@@ -33,9 +33,9 @@ public class L2FileOutputStream extends FinishableOutputStream {
 
     private boolean finished;
 
-    public L2FileOutputStream(OutputStream output, int version, boolean writeChecksum) throws IOException {
+    public L2FileOutputStream(OutputStream output, String name, int version, boolean writeChecksum) throws IOException {
         this.output = output;
-        this.stream = getOutputStream(output, version);
+        this.stream = getOutputStream(output, name, version);
 
         this.writeChecksum = writeChecksum;
 
@@ -46,7 +46,7 @@ public class L2FileOutputStream extends FinishableOutputStream {
         output.write(("Lineage2Ver" + version).getBytes(Charset.forName("utf-16le")));
     }
 
-    private FinishableOutputStream getOutputStream(OutputStream output, int version) {
+    private FinishableOutputStream getOutputStream(OutputStream output, String name, int version) {
         switch (version) {
             //XOR
             case 111:
@@ -54,7 +54,7 @@ public class L2FileOutputStream extends FinishableOutputStream {
             case 120:
                 return new L2Ver120OutputStream(output);
             case 121:
-                throw new RuntimeException("Not done yet");
+                return new L2Ver121OutputStream(output, L2Ver121.getXORKey(name));
             //BLOWFISH
             case 211:
             case 212:

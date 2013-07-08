@@ -18,13 +18,14 @@ package ee.l2.clientstuff.files.crypt.xor;
  * @author acmi
  */
 public class L2Ver120 {
-    public static final int INITIAL = 0xE6;
+    public static final int START_IND = 0xE6;
 
     public static int getXORKey(int n) {
-        int id = (n >> 8) & 0xff;
-        int i = (n >> 4) & 0xf;
-        int j = n & 0xf;
-        return (HELP_TABLE[(id >> 4) & 0xf][i] << 4) | HELP_TABLE[id & 0xf][j];
+        int id = (n >> 8) & 0xff;  //table id
+        int i = (n >> 4) & 0xf;    //table row
+        int j = n & 0xf;           //table col
+        return (HELP_TABLE[(id >> 4) & 0xf][i] << 4) |
+                HELP_TABLE[id & 0xf][j];
     }
 
     private static final int[][] HELP_TABLE = new int[][]{

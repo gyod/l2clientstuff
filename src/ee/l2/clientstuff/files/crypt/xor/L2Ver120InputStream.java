@@ -20,7 +20,7 @@ import java.io.*;
  * @author acmi
  */
 public class L2Ver120InputStream extends FilterInputStream {
-    private int ind = L2Ver120.INITIAL;
+    private int ind = L2Ver120.START_IND;
 
     public L2Ver120InputStream(InputStream input) {
         super(input);

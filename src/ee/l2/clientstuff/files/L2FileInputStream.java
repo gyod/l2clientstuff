@@ -30,15 +30,15 @@ import static ee.l2.clientstuff.files.crypt.blowfish.L2Ver21xInputStream.*;
 public class L2FileInputStream extends InputStream {
     private InputStream stream;
 
-    public L2FileInputStream(InputStream input, boolean l2encdec) throws IOException {
-        stream = getInputStream(input, l2encdec);
+    public L2FileInputStream(InputStream input, String name, boolean l2encdec) throws IOException {
+        stream = getInputStream(input, name, l2encdec);
     }
 
-    public L2FileInputStream(InputStream input) throws IOException {
-        this(input, false);
+    public L2FileInputStream(InputStream input, String name) throws IOException {
+        this(input, name, false);
     }
 
-    private InputStream getInputStream(InputStream input, boolean l2encdec) throws IOException {
+    private InputStream getInputStream(InputStream input, String name, boolean l2encdec) throws IOException {
         int version = readVersion(input);
 
         switch (version) {
@@ -48,7 +48,7 @@ public class L2FileInputStream extends InputStream {
             case 120:
                 return new L2Ver120InputStream(input);
             case 121:
-                throw new RuntimeException("Not done yet");
+                return new L2Ver121InputStream(input, L2Ver121.getXORKey(name));
             //BLOWFISH
             case 211:
             case 212:
