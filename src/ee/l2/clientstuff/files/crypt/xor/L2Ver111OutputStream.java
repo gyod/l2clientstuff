@@ -14,10 +14,33 @@
  */
 package ee.l2.clientstuff.files.crypt.xor;
 
+import ee.l2.clientstuff.files.FinishableOutputStream;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * @author acmi
  */
-public interface L2Ver1x1 {
-    public static final int XOR_KEY_111 = 0xAC;
-    public static final int XOR_KEY_121 = 0x22;
+public class L2Ver111OutputStream extends FinishableOutputStream implements L2Ver111 {
+    private OutputStream output;
+
+    public L2Ver111OutputStream(OutputStream output){
+        this.output = output;
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        output.write(b ^ XOR_KEY_111);
+    }
+
+    @Override
+    public void flush() throws IOException {
+        output.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        output.close();
+    }
 }

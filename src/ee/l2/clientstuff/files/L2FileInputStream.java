@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import static ee.l2.clientstuff.files.crypt.blowfish.L2Ver21xInputStream.*;
-import static ee.l2.clientstuff.files.crypt.xor.L2Ver1x1InputStream.*;
 
 /**
  * @author acmi
@@ -45,12 +44,11 @@ public class L2FileInputStream extends InputStream {
         switch (version) {
             //XOR
             case 111:
-            case 121:
-                return new L2Ver1x1InputStream(input, version == 111 ?
-                        XOR_KEY_111 :
-                        XOR_KEY_121);
+                return new L2Ver111InputStream(input);
             case 120:
                 return new L2Ver120InputStream(input);
+            case 121:
+                throw new RuntimeException("Not done yet");
             //BLOWFISH
             case 211:
             case 212:

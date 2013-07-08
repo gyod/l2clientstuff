@@ -22,7 +22,6 @@ import java.io.*;
 import java.nio.charset.Charset;
 
 import static ee.l2.clientstuff.files.crypt.blowfish.L2Ver21xOutputStream.*;
-import static ee.l2.clientstuff.files.crypt.xor.L2Ver1x1OutputStream.*;
 
 /**
  * @author acmi
@@ -51,12 +50,11 @@ public class L2FileOutputStream extends FinishableOutputStream {
         switch (version) {
             //XOR
             case 111:
-            case 121:
-                return new L2Ver1x1OutputStream(output, version == 111 ?
-                        XOR_KEY_111 :
-                        XOR_KEY_121);
+                return new L2Ver111OutputStream(output);
             case 120:
                 return new L2Ver120OutputStream(output);
+            case 121:
+                throw new RuntimeException("Not done yet");
             //BLOWFISH
             case 211:
             case 212:

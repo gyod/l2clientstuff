@@ -14,35 +14,9 @@
  */
 package ee.l2.clientstuff.files.crypt.xor;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * @author acmi
  */
-public class L2Ver1x1InputStream extends FilterInputStream implements L2Ver1x1{
-    private int xorKey;
-
-    public L2Ver1x1InputStream(InputStream input, int xorKey) {
-        super(input);
-        this.xorKey = xorKey;
-    }
-
-    @Override
-    public int read() throws IOException {
-        int b = in.read();
-        return b < 0 ? b : b ^ xorKey;
-    }
-
-    @Override
-    public synchronized void mark(int readlimit) {}
-
-    @Override
-    public synchronized void reset() throws IOException {}
-
-    @Override
-    public boolean markSupported() {
-        return false;
-    }
+public interface L2Ver111 {
+    public static final int XOR_KEY_111 = 0xAC;
 }

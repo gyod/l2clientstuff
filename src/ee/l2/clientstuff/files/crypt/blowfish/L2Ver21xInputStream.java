@@ -15,6 +15,7 @@
 package ee.l2.clientstuff.files.crypt.blowfish;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 
 /**
  * @author acmi
@@ -23,8 +24,10 @@ public class L2Ver21xInputStream extends FilterInputStream implements L2Ver21x{
     private BlowfishEngine blowfish = new BlowfishEngine();
 
     private byte[] readBuffer = new byte[8];
-    private byte[] dataBuffer = new byte[8];
-    private int pos = dataBuffer.length - 1;
+    private ByteBuffer dataBuffer = ByteBuffer.allocate(8);
+    {
+        dataBuffer.position(dataBuffer.limit());
+    }
 
     public L2Ver21xInputStream(InputStream input, byte[] key){
         super(input);
@@ -34,16 +37,15 @@ public class L2Ver21xInputStream extends FilterInputStream implements L2Ver21x{
 
     @Override
     public int read() throws IOException {
-        if (pos == dataBuffer.length - 1) {
+        if (dataBuffer.position() == dataBuffer.limit()) {
             int r = in.read(readBuffer);
             if (r != readBuffer.length)
                 return -1;
 
-            blowfish.processBlock(readBuffer, 0, dataBuffer, 0);
+            dataBuffer.clear();
+            blowfish.processBlock(readBuffer, 0, dataBuffer.array(), dataBuffer.arrayOffset());
         }
-        pos++;
-        pos &= 0b111;
-        return dataBuffer[pos];
+        return dataBuffer.get() & 0xff;
     }
 
     @Override

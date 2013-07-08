@@ -14,35 +14,33 @@
  */
 package ee.l2.clientstuff.files.crypt.xor;
 
-import ee.l2.clientstuff.files.FinishableOutputStream;
-
+import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 
 /**
  * @author acmi
  */
-public class L2Ver1x1OutputStream extends FinishableOutputStream implements L2Ver1x1{
-    private OutputStream output;
-    private int xorKey;
+public class L2Ver111InputStream extends FilterInputStream implements L2Ver111 {
 
-    public L2Ver1x1OutputStream(OutputStream output, int xorKey){
-        this.output = output;
-        this.xorKey = xorKey;
+    public L2Ver111InputStream(InputStream input) {
+        super(input);
     }
 
     @Override
-    public void write(int b) throws IOException {
-        output.write(b ^ xorKey);
+    public int read() throws IOException {
+        int b = in.read();
+        return b < 0 ? b : b ^ XOR_KEY_111;
     }
 
     @Override
-    public void flush() throws IOException {
-        output.flush();
-    }
+    public synchronized void mark(int readlimit) {}
 
     @Override
-    public void close() throws IOException {
-        output.close();
+    public synchronized void reset() throws IOException {}
+
+    @Override
+    public boolean markSupported() {
+        return false;
     }
 }
