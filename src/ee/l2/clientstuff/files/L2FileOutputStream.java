@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 
 import static ee.l2.clientstuff.files.crypt.blowfish.L2Ver21xOutputStream.*;
+import static ee.l2.clientstuff.files.crypt.rsa.L2Ver41xOutputStream.*;
 
 /**
  * @author acmi
@@ -66,7 +67,7 @@ public class L2FileOutputStream extends FinishableOutputStream {
             case 412:
             case 413:
             case 414:
-                return new L2Ver41xOutputStream(output);
+                return new L2Ver41xOutputStream(output, MODULUS_L2ENCDEC, PUBLIC_EXPONENT_L2ENCDEC);
             default:
                 throw new RuntimeException("Unsupported version: " + version);
         }

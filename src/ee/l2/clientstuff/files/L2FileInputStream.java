@@ -19,10 +19,12 @@ import ee.l2.clientstuff.files.crypt.rsa.*;
 import ee.l2.clientstuff.files.crypt.xor.*;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import static ee.l2.clientstuff.files.crypt.blowfish.L2Ver21xInputStream.*;
+import static ee.l2.clientstuff.files.crypt.rsa.L2Ver41xInputStream.*;
 
 /**
  * @author acmi
@@ -57,10 +59,21 @@ public class L2FileInputStream extends InputStream {
                         BLOWFISH_KEY_212);
             //RSA
             case 411:
+                return new L2Ver41xInputStream(input,
+                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_411,
+                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_411);
             case 412:
+                return new L2Ver41xInputStream(input,
+                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_412,
+                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_412);
             case 413:
+                return new L2Ver41xInputStream(input,
+                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_413,
+                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_413);
             case 414:
-                return new L2Ver41xInputStream(input, l2encdec);
+                return new L2Ver41xInputStream(input,
+                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_414,
+                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_414);
             default:
                 throw new RuntimeException("Unsupported version: " + version);
         }

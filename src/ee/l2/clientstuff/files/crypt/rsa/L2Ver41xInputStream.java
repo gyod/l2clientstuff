@@ -45,16 +45,6 @@ public class L2Ver41xInputStream extends InputStream implements L2Ver41x {
         stream = new InflaterInputStream(rsaInputStream);
     }
 
-    public L2Ver41xInputStream(InputStream input, boolean l2encdec) throws IOException {
-        this(input,
-                l2encdec ? MODULUS_L2ENCDEC : MODULUS_ORIGINAL,
-                l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_ORIGINAL);
-    }
-
-    public L2Ver41xInputStream(InputStream input) throws IOException {
-        this(input, MODULUS_ORIGINAL, PRIVATE_EXPONENT_ORIGINAL);
-    }
-
     @Override
     public int read() throws IOException {
         if (closed)

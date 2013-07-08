@@ -39,10 +39,6 @@ public class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ve
         }
     }
 
-    public L2Ver41xOutputStream(OutputStream output){
-        this(output, MODULUS_L2ENCDEC, PUBLIC_EXPONENT_L2ENCDEC);
-    }
-
     @Override
     public void write(int b) throws IOException {
         if (finished)
