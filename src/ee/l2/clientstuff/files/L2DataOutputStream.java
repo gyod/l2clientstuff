@@ -213,12 +213,24 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
                 Length lenAnn = field.getAnnotation(Length.class);
                 if (lenAnn != null) {
                     if (lenAnn.value() == 0) {
-                        if (!lenAnn.sameAs().equals("")) {
-                            Field arrField = clazz.getDeclaredField(lenAnn.sameAs());
-                            arrField.setAccessible(true);
-                            int lenExpected = Array.getLength(arrField.get(obj)) + lenAnn.add();
+                        if (!lenAnn.field().equals("")) {
+                            Field fieldLen = clazz.getDeclaredField(lenAnn.field());
+                            fieldLen.setAccessible(true);
+                            int lenExpected;
+                            if (fieldLen.getType().isArray()) {
+                                lenExpected = Array.getLength(fieldLen.get(obj)) + lenAnn.add();
+                            } else if (fieldLen.getType() == Integer.class) {
+                                lenExpected = ((Number) fieldLen.get(obj)).intValue();
+                            } else if (fieldLen.getType() == Integer.TYPE) {
+                                lenExpected = fieldLen.getInt(obj);
+                            } else
+                                throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                        ": couldn't extract length from field " + fieldLen.getName());
+
                             if (lenExpected != len)
-                                throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": length expected " + lenExpected + ", got" + len);
+                                throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                        ": length expected " + lenExpected +
+                                        ", got" + len);
                         } else
                             len += lenAnn.add();
 
@@ -250,23 +262,40 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
             } else {
                 if (field.getType() == Boolean.TYPE) {
                     writeBoolean(field.getBoolean(obj));
-                } else if (field.getType() == Byte.TYPE) {
-                    writeByte(field.getByte(obj));
-                } else if (field.getType() == Short.TYPE) {
+                } else if (field.getType() == Byte.class || field.getType() == Byte.TYPE) {
+                    int val = 0;
+                    if (field.getType() == Byte.class) {
+                        Object valObj = field.get(obj);
+                        if (valObj != null)
+                            val = (Byte) valObj;
+                    } else
+                        val = field.getByte(obj);
+                    val &= 0xff;
+
+                    IntConst intConst = field.getAnnotation(IntConst.class);
+                    if (intConst != null && val != intConst.value())
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                ": IntConst expected " + intConst.value() +
+                                ", got" + val);
+
+                    writeByte(val);
+                } else if (field.getType() == Short.class || field.getType() == Short.TYPE) {
                     int val = 0;
                     if (field.getType() == Short.class) {
                         Object valObj = field.get(obj);
                         if (valObj != null)
-                            val = (Integer) valObj;
+                            val = (Short) valObj;
                     } else
                         val = field.getShort(obj);
                     val &= 0xffff;
 
                     IntConst intConst = field.getAnnotation(IntConst.class);
                     if (intConst != null && val != intConst.value())
-                        throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": IntConst expected " + intConst.value() + ", got" + val);
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                ": IntConst expected " + intConst.value() +
+                                ", got" + val);
 
-                    writeShort(field.getShort(obj));
+                    writeShort(val);
                 } else if (field.getType() == Character.TYPE) {
                     writeChar(field.getChar(obj));
                 } else if (field.getType() == Integer.class || field.getType() == Integer.TYPE) {
@@ -280,10 +309,12 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
 
                     IntConst intConst = field.getAnnotation(IntConst.class);
                     if (intConst != null && val != intConst.value())
-                        throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": IntConst expected " + intConst.value() + ", got" + val);
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                ": IntConst expected " + intConst.value() +
+                                ", got" + val);
 
                     if (field.isAnnotationPresent(Compact.class))
-                        writeCompactInt(field.getInt(obj));
+                        writeCompactInt(val);
                     else
                         writeInt(val);
                 } else if (field.getType() == Long.TYPE) {
@@ -298,7 +329,9 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
 
                     StringConst stringConst = field.getAnnotation(StringConst.class);
                     if (stringConst != null && !val.equals(stringConst.value()))
-                        throw new IOException(clazz.getSimpleName() + "." + field.getName() + ": StringConst expected " + stringConst.value() + ", got" + val);
+                        throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                ": StringConst expected " + stringConst.value() +
+                                ", got" + val);
 
                     if (field.isAnnotationPresent(Unicode.class))
                         writeUTF(field.get(obj).toString());

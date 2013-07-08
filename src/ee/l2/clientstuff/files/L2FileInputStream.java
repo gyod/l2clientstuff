@@ -19,7 +19,6 @@ import ee.l2.clientstuff.files.crypt.rsa.*;
 import ee.l2.clientstuff.files.crypt.xor.*;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 

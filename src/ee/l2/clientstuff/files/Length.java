@@ -22,11 +22,25 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Length {
+    /**
+     * @return length constant value
+     */
     public int value() default 0;
 
+    /**
+     * @see LengthType
+     * @return length representation type
+     */
     public LengthType lengthType() default LengthType.INT;
 
-    public String sameAs() default "";
+    /**
+     * Field which contains length. Can be Integer/int or array(same length).
+     * @return field name
+     */
+    public String field() default "";
 
+    /**
+     * @return length modifier
+     */
     public int add() default 0;
 }

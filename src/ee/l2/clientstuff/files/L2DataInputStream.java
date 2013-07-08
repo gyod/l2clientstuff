@@ -21,8 +21,8 @@ import java.nio.charset.Charset;
 /**
  * @author acmi
  */
-public class L2DataInputStream extends FilterInputStream implements DataInput{
-    
+public class L2DataInputStream extends FilterInputStream implements DataInput {
+
     public L2DataInputStream(InputStream input) {
         super(input);
     }
@@ -127,11 +127,9 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
                 output |= (x & 0x3F);
                 if ((x & 0x40) == 0)
                     break;
-            }
-            else if (i == 4) {
+            } else if (i == 4) {
                 output |= (x & 0x1F) << (6 + (3 * 7));
-            }
-            else {
+            } else {
                 output |= (x & 0x7F) << (6 + ((i - 1) * 7));
                 if ((x & 0x80) == 0)
                     break;
@@ -182,7 +180,8 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
             return "";
 
         byte[] bytes = new byte[len > 0 ? len : -2 * len];
-        in.read(bytes);
+        if (in.read(bytes) == -1)
+            throw new EOFException();
         return new String(bytes, 0, bytes.length - (len > 0 ? 1 : 2), Charset.forName(len > 0 ? "ascii" : "utf-16le"));
     }
 
@@ -193,27 +192,29 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
             return "";
 
         byte[] bytes = new byte[len];
-        in.read(bytes);
+        if (in.read(bytes) == -1)
+            throw new EOFException();
         return new String(bytes, Charset.forName("utf-16le"));
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T readObject(Class<T> clazz) throws IOException, ReflectiveOperationException {
         if (clazz == Boolean.TYPE || clazz == Boolean.class) {
-            return (T) new Boolean(readBoolean());
+            return (T) Boolean.valueOf(readBoolean());
         } else if (clazz == Byte.TYPE || clazz == Byte.class) {
-            return (T) new Byte(readByte());
+            return (T) Byte.valueOf(readByte());
         } else if (clazz == Short.TYPE || clazz == Short.class) {
-            return (T) new Short(readShort());
+            return (T) Short.valueOf(readShort());
         } else if (clazz == Character.TYPE || clazz == Character.class) {
-            return (T) new Character(readChar());
+            return (T) Character.valueOf(readChar());
         } else if (clazz == Integer.TYPE || clazz == Integer.class) {
-            return (T) new Integer(readInt());
+            return (T) Integer.valueOf(readInt());
         } else if (clazz == Long.TYPE || clazz == Long.class) {
-            return (T) new Long(readLong());
+            return (T) Long.valueOf(readLong());
         } else if (clazz == Float.TYPE || clazz == Float.class) {
-            return (T) new Float(readFloat());
+            return (T) Float.valueOf(readFloat());
         } else if (clazz == Double.TYPE || clazz == Double.class) {
-            return (T) new Double(readDouble());
+            return (T) Double.valueOf(readDouble());
         } else {
             T obj = clazz.newInstance();
 
@@ -232,15 +233,23 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
                 if (field.getType().isArray()) {
                     int len;
                     Length lenAnn = field.getAnnotation(Length.class);
-                    if (lenAnn != null){
+                    if (lenAnn != null) {
                         if (lenAnn.value() != 0)
                             len = lenAnn.value();
-                        else if (!lenAnn.sameAs().equals("")){
-                            Field arrSameLen = clazz.getDeclaredField(lenAnn.sameAs());
-                            arrSameLen.setAccessible(true);
-                            len = Array.getLength(arrSameLen.get(obj)) + lenAnn.add();
-                        }else{
-                            switch(lenAnn.lengthType()){
+                        else if (!lenAnn.field().equals("")) {
+                            Field fieldLen = clazz.getDeclaredField(lenAnn.field());
+                            fieldLen.setAccessible(true);
+                            if (fieldLen.getType().isArray()) {
+                                len = Array.getLength(fieldLen.get(obj)) + lenAnn.add();
+                            } else if (fieldLen.getType() == Integer.class) {
+                                len = ((Number) fieldLen.get(obj)).intValue();
+                            } else if (fieldLen.getType() == Integer.TYPE) {
+                                len = fieldLen.getInt(obj);
+                            } else
+                                throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                        ": couldn't extract length from field " + fieldLen.getName());
+                        } else {
+                            switch (lenAnn.lengthType()) {
                                 case COMPACT:
                                     len = readCompactInt();
                                     break;
@@ -249,19 +258,19 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
                             }
                             len += lenAnn.add();
                         }
-                    }else
+                    } else
                         len = readInt();
 
                     Object arr = Array.newInstance(field.getType().getComponentType(), len);
                     for (int i = 0; i < len; i++) {
                         Object el;
 
-                        if (field.getType().getComponentType() == String.class){
+                        if (field.getType().getComponentType() == String.class) {
                             if (field.isAnnotationPresent(Unicode.class))
                                 el = readUTF();
                             else
                                 el = readLine();
-                        }else if (field.isAnnotationPresent(Compact.class) &&
+                        } else if (field.isAnnotationPresent(Compact.class) &&
                                 (field.getType().getComponentType() == Integer.class ||
                                         field.getType().getComponentType() == Integer.TYPE))
                             el = readCompactInt();
@@ -272,24 +281,48 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
                     }
                     field.set(obj, arr);
                 } else {
-                    if (field.getType() == Short.class ||
-                            field.getType() == Short.TYPE ||
-                            field.getType() == Integer.class ||
+                    if (field.getType() == Byte.class ||
+                            field.getType() == Byte.TYPE) {
+                        byte val = readByte();
+
+                        IntConst intConst = field.getAnnotation(IntConst.class);
+                        if (intConst != null && (val & 0xff) != intConst.value())
+                            throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                    ": IntConst expected " + Integer.toHexString(intConst.value()) +
+                                    ", got " + Integer.toHexString(val));
+
+                        if (field.getType() == Byte.TYPE)
+                            field.setByte(obj, val);
+                        else
+                            field.set(obj, val);
+                    } else if (field.getType() == Short.class ||
+                            field.getType() == Short.TYPE) {
+                        short val = readByte();
+
+                        IntConst intConst = field.getAnnotation(IntConst.class);
+                        if (intConst != null && (val & 0xffff) != intConst.value())
+                            throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                    ": IntConst expected " + Integer.toHexString(intConst.value()) +
+                                    ", got " + Integer.toHexString(val));
+
+                        if (field.getType() == Short.TYPE)
+                            field.setShort(obj, val);
+                        else
+                            field.set(obj, val);
+                    } else if (field.getType() == Integer.class ||
                             field.getType() == Integer.TYPE) {
                         int val = field.isAnnotationPresent(Compact.class) ?
                                 readCompactInt() :
-                                (field.getType() == Short.class || field.getType() == Short.TYPE) ?
-                                        readShort() & 0xffff :
-                                        readInt();
+                                readInt();
 
                         IntConst intConst = field.getAnnotation(IntConst.class);
                         if (intConst != null && val != intConst.value())
-                            throw new IOException(clazz.getSimpleName()+"."+field.getName()+": IntConst expected " + Integer.toHexString(intConst.value()) + ", got " + Integer.toHexString(val));
+                            throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                    ": IntConst expected " + Integer.toHexString(intConst.value()) +
+                                    ", got " + Integer.toHexString(val));
 
                         if (field.getType() == Integer.TYPE)
                             field.setInt(obj, val);
-                        else if (field.getType() == Short.TYPE)
-                            field.setShort(obj, (short) val);
                         else
                             field.set(obj, val);
                     } else if (field.getType() == String.class) {
@@ -299,7 +332,9 @@ public class L2DataInputStream extends FilterInputStream implements DataInput{
 
                         StringConst stringConst = field.getAnnotation(StringConst.class);
                         if (stringConst != null && !val.equals(stringConst.value()))
-                            throw new IOException(clazz.getSimpleName()+"."+field.getName()+": StringConst expected " + stringConst.value() + ", got " + val);
+                            throw new IOException(clazz.getSimpleName() + "." + field.getName() +
+                                    ": StringConst expected " + stringConst.value() +
+                                    ", got " + val);
 
                         field.set(obj, val);
                     } else {
