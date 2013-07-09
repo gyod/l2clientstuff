@@ -30,15 +30,15 @@ import static ee.l2.clientstuff.files.crypt.rsa.L2Ver41xOutputStream.*;
 public class L2FileOutputStream extends FinishableOutputStream {
     private OutputStream output;
     private FinishableOutputStream stream;
-    private boolean writeChecksum;
+    private boolean writeTail;
 
     private boolean finished;
 
-    public L2FileOutputStream(OutputStream output, String name, int version, boolean writeChecksum) throws IOException {
+    public L2FileOutputStream(OutputStream output, String name, int version, boolean writeTail) throws IOException {
         this.output = output;
         this.stream = getOutputStream(output, name, version);
 
-        this.writeChecksum = writeChecksum;
+        this.writeTail = writeTail;
 
         writeHeader(version);
     }
@@ -92,7 +92,7 @@ public class L2FileOutputStream extends FinishableOutputStream {
 
         stream.finish();
 
-        if (writeChecksum) {
+        if (writeTail) {
             //TODO
             for (int i = 0; i < 20; i++)
                 output.write(0);

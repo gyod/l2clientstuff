@@ -196,8 +196,7 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
 
             int mod = field.getModifiers();
             if (Modifier.isTransient(mod) ||
-                    Modifier.isStatic(mod) ||
-                    Modifier.isFinal(mod))
+                    Modifier.isStatic(mod))
                 continue;
 
             field.setAccessible(true);
@@ -208,7 +207,6 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
                     array = Array.newInstance(field.getType().getComponentType(), 0);
 
                 int len = Array.getLength(array);
-
 
                 Length lenAnn = field.getAnnotation(Length.class);
                 if (lenAnn != null) {
