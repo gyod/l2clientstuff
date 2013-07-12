@@ -23,8 +23,6 @@ import java.util.Objects;
  * @author acmi
  */
 public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
-    private OutputStream output;
-
     private static int bufferSizeIncrement = 0x1000000;  //16MB
 
     private ByteBuffer buffer = ByteBuffer.allocate(bufferSizeIncrement);
@@ -33,7 +31,7 @@ public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
     }
 
     public BufferedRandomAccessOutputStream(OutputStream output){
-        this.output = Objects.requireNonNull(output);
+        super(Objects.requireNonNull(output));
     }
 
     @Override
@@ -85,7 +83,7 @@ public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
         if (buffer == null)
             throw new IOException("Stream closed");
 
-        output.flush();
+        out.flush();
     }
 
     @Override
@@ -93,7 +91,7 @@ public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
         if (buffer == null)
             throw new IOException("Stream closed");
 
-        output.write(buffer.array(), 0, buffer.limit());
+        write(buffer.array(), 0, buffer.limit());
         flush();
     }
 
@@ -102,9 +100,7 @@ public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
         if (buffer == null)
             return;
 
-        super.close();
-
         buffer = null;
-        output.close();
+        super.close();
     }
 }

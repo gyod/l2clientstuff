@@ -24,13 +24,13 @@ import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author acmi
  */
 public class RSAOutputStream extends FinishableOutputStream {
-    private OutputStream output;
-
     private Cipher cipher;
 
     private ByteBuffer dataBuffer = ByteBuffer.allocate(124);
@@ -39,7 +39,7 @@ public class RSAOutputStream extends FinishableOutputStream {
     private boolean finished;
 
     public RSAOutputStream(OutputStream output, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException {
-        this.output = output;
+        super(Objects.requireNonNull(output));
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, exponent);
@@ -53,16 +53,12 @@ public class RSAOutputStream extends FinishableOutputStream {
             throw new IOException("write beyond end of stream");
 
         dataBuffer.put((byte) b);
+
         if (dataBuffer.position() == dataBuffer.limit()) {
             writeData();
 
             dataBuffer.clear();
         }
-    }
-
-    @Override
-    public void flush() throws IOException {
-        output.flush();
     }
 
     @Override
@@ -75,21 +71,12 @@ public class RSAOutputStream extends FinishableOutputStream {
         flush();
     }
 
-    @Override
-    public void close() throws IOException {
-        super.close();
-
-        output.close();
-    }
-
     private void writeData() throws IOException {
         int size = dataBuffer.position();
         if (size == 0)
             return;
 
-        block[0] = 0;
-        block[1] = 0;
-        block[2] = 0;
+        Arrays.fill(block, (byte)0);
         block[3] = (byte) (size & 0xff);
         System.arraycopy(dataBuffer.array(), 0, block, 128 - size - ((124 - size) % 4), size);
 
@@ -99,6 +86,6 @@ public class RSAOutputStream extends FinishableOutputStream {
             throw new IOException(e);
         }
 
-        output.write(block);
+        out.write(block);
     }
 }

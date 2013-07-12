@@ -19,24 +19,19 @@ import ee.l2.clientstuff.files.streams.FinishableOutputStream;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.util.Objects;
 import java.util.zip.DeflaterOutputStream;
 
 /**
  * @author acmi
  */
 public class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ver41x{
-    private RSAOutputStream output;
-
     private ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream(0);
 
     private boolean finished;
 
-    public L2Ver41xOutputStream(OutputStream output, BigInteger modulus, BigInteger exponent) {
-        try {
-            this.output = new RSAOutputStream(output, modulus, exponent);
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
+    public L2Ver41xOutputStream(OutputStream output, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException{
+        super(new RSAOutputStream(Objects.requireNonNull(output), modulus, exponent));
     }
 
     @Override
@@ -48,30 +43,18 @@ public class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ve
     }
 
     @Override
-    public void flush() throws IOException {
-        output.flush();
-    }
-
-    @Override
     public void finish() throws IOException {
         if (finished)
             return;
 
         finished = true;
 
-        new DataOutputStream(output).writeInt(Integer.reverseBytes(dataBuffer.size()));
+        new DataOutputStream(out).writeInt(Integer.reverseBytes(dataBuffer.size()));
 
-        DeflaterOutputStream deflaterOutputStream = new DeflaterOutputStream(output);
+        DeflaterOutputStream deflaterOutputStream = new DeflaterOutputStream(out);
         dataBuffer.writeTo(deflaterOutputStream);
         deflaterOutputStream.finish();
 
-        output.finish();
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
-
-        output.close();
+        ((RSAOutputStream)out).finish();
     }
 }

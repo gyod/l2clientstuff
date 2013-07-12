@@ -22,7 +22,18 @@ import java.io.OutputStream;
 /**
  * @author acmi
  */
-public abstract class RandomAccessOutputStream extends FinishableOutputStream {
-    public abstract int position() throws IOException;
-    public abstract void seek(int pos) throws IOException;
+public abstract class RandomAccessOutputStream extends FinishableOutputStream implements RandomAccess{
+
+    /**
+     * Creates an output stream filter built on top of the specified
+     * underlying output stream.
+     *
+     * @param out the underlying output stream to be assigned to
+     *            the field <tt>this.out</tt> for later use, or
+     *            <code>null</code> if this instance is to be
+     *            created without an underlying stream.
+     */
+    public RandomAccessOutputStream(OutputStream out) {
+        super(out);
+    }
 }

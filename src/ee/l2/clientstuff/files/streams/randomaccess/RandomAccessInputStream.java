@@ -19,7 +19,5 @@ import java.io.*;
 /**
  * @author acmi
  */
-public abstract class RandomAccessInputStream extends InputStream {
-    public abstract int position() throws IOException;
-    public abstract void seek(int pos) throws IOException;
+public abstract class RandomAccessInputStream extends InputStream implements RandomAccess{
 }

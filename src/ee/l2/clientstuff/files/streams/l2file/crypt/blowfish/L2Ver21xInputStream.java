@@ -16,6 +16,7 @@ package ee.l2.clientstuff.files.streams.l2file.crypt.blowfish;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 /**
  * @author acmi
@@ -30,9 +31,9 @@ public class L2Ver21xInputStream extends FilterInputStream implements L2Ver21x{
     }
 
     public L2Ver21xInputStream(InputStream input, byte[] key){
-        super(input);
+        super(Objects.requireNonNull(input));
 
-        blowfish.init(false, key);
+        blowfish.init(false, Objects.requireNonNull(key, "key"));
     }
 
     @Override

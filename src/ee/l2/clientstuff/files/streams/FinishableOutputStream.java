@@ -19,7 +19,20 @@ import java.io.*;
 /**
  * @author acmi
  */
-public abstract class FinishableOutputStream extends OutputStream{
+public abstract class FinishableOutputStream extends FilterOutputStream{
+    /**
+     * Creates an output stream filter built on top of the specified
+     * underlying output stream.
+     *
+     * @param out the underlying output stream to be assigned to
+     *            the field <tt>this.out</tt> for later use, or
+     *            <code>null</code> if this instance is to be
+     *            created without an underlying stream.
+     */
+    public FinishableOutputStream(OutputStream out) {
+        super(out);
+    }
+
     /**
      * Finishes writing and flushes data to the output stream without closing
      * the underlying stream.
@@ -39,6 +52,10 @@ public abstract class FinishableOutputStream extends OutputStream{
      */
     @Override
     public void close() throws IOException {
-        finish();
+        try{
+            finish();
+        }finally{
+            out.close();
+        }
     }
 }

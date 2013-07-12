@@ -20,13 +20,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author acmi
  */
 public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ver21x{
-    private OutputStream output;
-
     private BlowfishEngine blowfish = new BlowfishEngine();
 
     private byte[] writeBuffer = new byte[8];
@@ -35,9 +34,9 @@ public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ve
     private boolean finished;
 
     public L2Ver21xOutputStream(OutputStream output, byte[] key) {
-        this.output = output;
+        super(Objects.requireNonNull(output));
 
-        blowfish.init(true, key);
+        blowfish.init(true, Objects.requireNonNull(key, "key"));
     }
 
     @Override
@@ -54,11 +53,6 @@ public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ve
     }
 
     @Override
-    public void flush() throws IOException {
-        output.flush();
-    }
-
-    @Override
     public void finish() throws IOException {
         if (finished)
             return;
@@ -68,19 +62,12 @@ public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ve
         flush();
     }
 
-    @Override
-    public void close() throws IOException {
-        super.close();
-
-        output.close();
-    }
-
     private void writeData() throws IOException {
         if (dataBuffer.position() == 0)
             return;
 
         Arrays.fill(dataBuffer.array(), dataBuffer.position(), dataBuffer.limit(), (byte)0);
         blowfish.processBlock(dataBuffer.array(), dataBuffer.arrayOffset(), writeBuffer, 0);
-        output.write(writeBuffer);
+        write(writeBuffer);
     }
 }

@@ -15,6 +15,7 @@
 package ee.l2.clientstuff.files.streams.l2file.crypt.xor;
 
 import java.io.*;
+import java.util.Objects;
 
 /**
  * @author acmi
@@ -23,7 +24,7 @@ public class L2Ver120InputStream extends FilterInputStream {
     private int ind = L2Ver120.START_IND;
 
     public L2Ver120InputStream(InputStream input) {
-        super(input);
+        super(Objects.requireNonNull(input));
     }
 
     @Override
@@ -40,5 +41,16 @@ public class L2Ver120InputStream extends FilterInputStream {
     @Override
     public void close() throws IOException {
         in.close();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {}
+
+    @Override
+    public synchronized void reset() throws IOException {}
+
+    @Override
+    public boolean markSupported() {
+        return false;
     }
 }

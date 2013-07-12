@@ -19,7 +19,10 @@ import ee.l2.clientstuff.files.streams.l2file.crypt.rsa.*;
 import ee.l2.clientstuff.files.streams.l2file.crypt.xor.*;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xInputStream.*;
@@ -28,28 +31,28 @@ import static ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xInputStre
 /**
  * @author acmi
  */
-public class L2FileInputStream extends InputStream {
-    private InputStream stream;
+public class L2FileInputStream extends FilterInputStream {
 
     public L2FileInputStream(InputStream input, String name, boolean l2encdec) throws IOException {
-        stream = getInputStream(input, name, l2encdec);
+        super(getInputStream(Objects.requireNonNull(input), name, l2encdec));
     }
 
     public L2FileInputStream(InputStream input, String name) throws IOException {
         this(input, name, false);
     }
 
-    private InputStream getInputStream(InputStream input, String name, boolean l2encdec) throws IOException {
+    public static InputStream getInputStream(InputStream input, String name, boolean l2encdec) throws IOException {
         int version = readVersion(input);
 
         switch (version) {
             //XOR
             case 111:
-                return new L2Ver111InputStream(input);
+            case 121:
+                return new L2Ver1x1InputStream(input, version == 111 ?
+                        L2Ver1x1.XOR_KEY_111 :
+                        L2Ver1x1.getXORKey121(name));
             case 120:
                 return new L2Ver120InputStream(input);
-            case 121:
-                return new L2Ver121InputStream(input, L2Ver121.getXORKey(name));
             //BLOWFISH
             case 211:
             case 212:
@@ -58,27 +61,22 @@ public class L2FileInputStream extends InputStream {
                         BLOWFISH_KEY_212);
             //RSA
             case 411:
-                return new L2Ver41xInputStream(input,
-                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_411,
-                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_411);
             case 412:
-                return new L2Ver41xInputStream(input,
-                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_412,
-                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_412);
             case 413:
-                return new L2Ver41xInputStream(input,
-                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_413,
-                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_413);
             case 414:
-                return new L2Ver41xInputStream(input,
-                        l2encdec ? MODULUS_L2ENCDEC : MODULUS_414,
-                        l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : PRIVATE_EXPONENT_414);
+                BigInteger modulus = l2encdec ? MODULUS_L2ENCDEC : RSA_KEYS[version-411][0];
+                BigInteger exponent = l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : RSA_KEYS[version-411][1];
+                try {
+                    return new L2Ver41xInputStream(input, modulus, exponent);
+                } catch (GeneralSecurityException e) {
+                    throw new RuntimeException(e);
+                }
             default:
                 throw new RuntimeException("Unsupported version: " + version);
         }
     }
 
-    private int readVersion(InputStream input) throws IOException {
+    public static int readVersion(InputStream input) throws IOException {
         byte[] header = new byte[28];
         input.read(header);
         String headerStr = new String(header, Charset.forName("utf-16le"));
@@ -88,33 +86,10 @@ public class L2FileInputStream extends InputStream {
         return Integer.valueOf(headerStr.substring(11));
     }
 
-    @Override
-    public int read() throws IOException {
-        return stream.read();
-    }
-
-    @Override
-    public void close() throws IOException {
-        stream.close();
-    }
-
-    @Override
-    public int available() throws IOException {
-        return stream.available();
-    }
-
-    @Override
-    public synchronized void mark(int readlimit) {
-        stream.mark(readlimit);
-    }
-
-    @Override
-    public synchronized void reset() throws IOException {
-        stream.reset();
-    }
-
-    @Override
-    public boolean markSupported() {
-        return stream.markSupported();
-    }
+    private static final BigInteger RSA_KEYS[][] = new BigInteger[][]{
+            {MODULUS_411, PRIVATE_EXPONENT_411},
+            {MODULUS_412, PRIVATE_EXPONENT_412},
+            {MODULUS_413, PRIVATE_EXPONENT_413},
+            {MODULUS_414, PRIVATE_EXPONENT_414}
+    };
 }

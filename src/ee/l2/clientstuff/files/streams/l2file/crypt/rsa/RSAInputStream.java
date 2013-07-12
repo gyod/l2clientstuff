@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.spec.RSAPrivateKeySpec;
+import java.util.Objects;
 
 /**
  * @author acmi
@@ -40,13 +41,12 @@ public class RSAInputStream extends InputStream {
     private boolean closed;
 
     public RSAInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException {
+        this.input = Objects.requireNonNull(input);
+
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, exponent);
-        Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
+        cipher = Cipher.getInstance("RSA/ECB/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, keyFactory.generatePrivate(keySpec));
-
-        this.input = input;
-        this.cipher = cipher;
     }
 
     @Override

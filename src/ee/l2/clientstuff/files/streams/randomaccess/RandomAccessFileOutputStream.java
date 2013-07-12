@@ -27,6 +27,8 @@ public class RandomAccessFileOutputStream extends RandomAccessOutputStream{
     private RandomAccessFile file;
 
     public RandomAccessFileOutputStream(File file) throws FileNotFoundException {
+        super(null);
+
         this.file = new RandomAccessFile(Objects.requireNonNull(file), "rw");
     }
 
@@ -50,9 +52,17 @@ public class RandomAccessFileOutputStream extends RandomAccessOutputStream{
     }
 
     @Override
+    public void write(byte[] b) throws IOException {
+        write(b, 0, b.length);
+    }
+
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
         file.write(b, off, len);
     }
+
+    @Override
+    public void flush() throws IOException {}
 
     @Override
     public void close() throws IOException {
@@ -60,4 +70,6 @@ public class RandomAccessFileOutputStream extends RandomAccessOutputStream{
 
         file.close();
     }
+
+
 }

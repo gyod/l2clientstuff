@@ -18,33 +18,21 @@ import ee.l2.clientstuff.files.streams.FinishableOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 /**
  * @author acmi
  */
-public class L2Ver121OutputStream extends FinishableOutputStream {
-    private OutputStream output;
+public class L2Ver1x1OutputStream extends FinishableOutputStream {
     private int xorKey;
 
-    public L2Ver121OutputStream(OutputStream output, int xorKey) {
-        this.output = output;
+    public L2Ver1x1OutputStream(OutputStream output, int xorKey) {
+        super(Objects.requireNonNull(output));
         this.xorKey = xorKey;
     }
 
     @Override
     public void write(int b) throws IOException {
-        output.write(b ^ xorKey);
-    }
-
-    @Override
-    public void flush() throws IOException {
-        output.flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
-
-        output.close();
+        out.write(b ^ xorKey);
     }
 }
