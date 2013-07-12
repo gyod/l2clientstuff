@@ -87,6 +87,9 @@ public class RSAOutputStream extends FinishableOutputStream {
         if (size == 0)
             return;
 
+        block[0] = 0;
+        block[1] = 0;
+        block[2] = 0;
         block[3] = (byte) (size & 0xff);
         System.arraycopy(dataBuffer.array(), 0, block, 128 - size - ((124 - size) % 4), size);
 
