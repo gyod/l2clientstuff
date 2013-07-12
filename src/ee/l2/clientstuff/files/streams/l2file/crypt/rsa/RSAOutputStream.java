@@ -34,6 +34,7 @@ public class RSAOutputStream extends FinishableOutputStream {
     private Cipher cipher;
 
     private ByteBuffer dataBuffer = ByteBuffer.allocate(124);
+    private byte[] block = new byte[128];
 
     private boolean finished;
 
@@ -86,14 +87,15 @@ public class RSAOutputStream extends FinishableOutputStream {
         if (size == 0)
             return;
 
-        byte[] block = new byte[125];
-        block[0] = (byte) (size & 0xff);
-        System.arraycopy(dataBuffer.array(), 0, block, 125 - size - ((124 - size) % 4), size);
+        block[3] = (byte) (size & 0xff);
+        System.arraycopy(dataBuffer.array(), 0, block, 128 - size - ((124 - size) % 4), size);
 
         try {
-            output.write(cipher.doFinal(block));
+            cipher.doFinal(block, 0, 128, block);
         } catch (GeneralSecurityException e) {
             throw new IOException(e);
         }
+
+        output.write(block);
     }
 }

@@ -39,7 +39,7 @@ public class RSAInputStream extends InputStream {
 
     private boolean closed;
 
-    public RSAInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException{
+    public RSAInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, exponent);
         Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
@@ -55,22 +55,26 @@ public class RSAInputStream extends InputStream {
             throw new IOException("Stream closed");
 
         if (dataBuffer.position() == dataBuffer.limit()) {
-            if (input.read(readBuffer) != readBuffer.length)
-                return -1;
+            int remain = readBuffer.length;
+            while (remain > 0) {
+                int r = input.read(readBuffer, readBuffer.length - remain, remain);
+                if (r < 0)
+                    return r;
+                remain -= r;
+            }
 
-            ByteBuffer block;
             try {
-                block = ByteBuffer.wrap(cipher.doFinal(readBuffer), 3, 125);
+                cipher.doFinal(readBuffer, 0, 128, readBuffer);
             } catch (GeneralSecurityException | IndexOutOfBoundsException e) {
                 throw new IOException(e);
             }
 
-            int size = block.get() & 0xff;
+            int size = readBuffer[3] & 0xff;
             if (size > 124)
                 throw new IOException("block data size too large");
 
             dataBuffer.clear();
-            dataBuffer.put(block.array(), 128 - size - ((124 - size) % 4), size);
+            dataBuffer.put(readBuffer, 128 - size - ((124 - size) % 4), size);
             dataBuffer.flip();
         }
 
