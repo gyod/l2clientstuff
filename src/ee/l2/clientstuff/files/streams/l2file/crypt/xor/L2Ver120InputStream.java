@@ -14,7 +14,9 @@
  */
 package ee.l2.clientstuff.files.streams.l2file.crypt.xor;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 /**
@@ -44,10 +46,12 @@ public class L2Ver120InputStream extends FilterInputStream {
     }
 
     @Override
-    public synchronized void mark(int readlimit) {}
+    public synchronized void mark(int readlimit) {
+    }
 
     @Override
-    public synchronized void reset() throws IOException {}
+    public synchronized void reset() throws IOException {
+    }
 
     @Override
     public boolean markSupported() {

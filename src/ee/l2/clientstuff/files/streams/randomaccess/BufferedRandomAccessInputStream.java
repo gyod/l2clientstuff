@@ -25,9 +25,10 @@ import java.util.Objects;
 public class BufferedRandomAccessInputStream extends RandomAccessInputStream {
     private InputStream input;
 
-    private static int bufferSizeIncrement = 0x1000000;  //16MB
+    private static final int BUFFER_SIZE_INCREMENT = 0x1000000;  //16MB
 
-    private ByteBuffer buffer = ByteBuffer.allocate(bufferSizeIncrement);
+    private ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE_INCREMENT);
+
     {
         buffer.limit(0);
     }
@@ -42,7 +43,7 @@ public class BufferedRandomAccessInputStream extends RandomAccessInputStream {
             throw new IOException("Stream closed");
 
         if (buffer.position() == buffer.capacity()) {
-            ByteBuffer newBuffer = ByteBuffer.allocate(buffer.capacity() + bufferSizeIncrement);
+            ByteBuffer newBuffer = ByteBuffer.allocate(buffer.capacity() + BUFFER_SIZE_INCREMENT);
             buffer.flip();
             newBuffer.put(buffer);
             newBuffer.limit(newBuffer.position());
@@ -68,13 +69,13 @@ public class BufferedRandomAccessInputStream extends RandomAccessInputStream {
         if (buffer == null)
             throw new IOException("Stream closed");
 
-        if (buffer.limit() < pos){
+        if (buffer.limit() < pos) {
             buffer.position(buffer.limit());
 
             int remaining = pos - buffer.position();
             int r;
             byte[] skipBuffer = new byte[remaining];
-            while(remaining > 0){
+            while (remaining > 0) {
                 r = read(skipBuffer, 0, remaining);
                 if (r < 0)
                     throw new IOException("End of stream reached");
@@ -86,7 +87,7 @@ public class BufferedRandomAccessInputStream extends RandomAccessInputStream {
     }
 
     @Override
-    public int position() throws IOException{
+    public int position() throws IOException {
         if (buffer == null)
             throw new IOException("Stream closed");
 
@@ -98,7 +99,7 @@ public class BufferedRandomAccessInputStream extends RandomAccessInputStream {
         if (buffer == null)
             throw new IOException("Stream closed");
 
-        return buffer.limit()-buffer.position();
+        return buffer.limit() - buffer.position();
     }
 
     @Override

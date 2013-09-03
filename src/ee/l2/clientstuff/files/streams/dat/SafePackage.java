@@ -14,10 +14,14 @@
  */
 package ee.l2.clientstuff.files.streams.dat;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Dat file ends with "SafePackage" string.
+ *
  * @author acmi
  */
 @Retention(RetentionPolicy.RUNTIME)

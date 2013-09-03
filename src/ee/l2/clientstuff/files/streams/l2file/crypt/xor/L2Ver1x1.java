@@ -20,10 +20,10 @@ package ee.l2.clientstuff.files.streams.l2file.crypt.xor;
 public class L2Ver1x1 {
     public static final int XOR_KEY_111 = 0xAC;
 
-    public static int getXORKey121(String filename){
+    public static int getXORKey121(String filename) {
         filename = filename.toLowerCase();
         int ind = 0;
-        for (int i=0; i<filename.length(); i++)
+        for (int i = 0; i < filename.length(); i++)
             ind += filename.charAt(i);
         return ind & 0xff;
     }

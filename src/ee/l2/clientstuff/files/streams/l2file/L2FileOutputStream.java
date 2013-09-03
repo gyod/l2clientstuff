@@ -15,17 +15,23 @@
 package ee.l2.clientstuff.files.streams.l2file;
 
 import ee.l2.clientstuff.files.streams.FinishableOutputStream;
-import ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.*;
-import ee.l2.clientstuff.files.streams.l2file.crypt.rsa.*;
-import ee.l2.clientstuff.files.streams.l2file.crypt.xor.*;
+import ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xOutputStream;
+import ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xOutputStream;
+import ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver120OutputStream;
+import ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver1x1OutputStream;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 
-import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xOutputStream.*;
-import static ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xOutputStream.*;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xOutputStream.BLOWFISH_KEY_211;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xOutputStream.BLOWFISH_KEY_212;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xOutputStream.MODULUS_L2ENCDEC;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xOutputStream.PUBLIC_EXPONENT_L2ENCDEC;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver1x1.XOR_KEY_111;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver1x1.getXORKey121;
 
 /**
  * @author acmi
@@ -55,8 +61,8 @@ public class L2FileOutputStream extends FinishableOutputStream {
             case 111:
             case 121:
                 return new L2Ver1x1OutputStream(output, version == 111 ?
-                        L2Ver1x1.XOR_KEY_111 :
-                        L2Ver1x1.getXORKey121(name));
+                        XOR_KEY_111 :
+                        getXORKey121(name));
             case 120:
                 return new L2Ver120OutputStream(output);
             //BLOWFISH

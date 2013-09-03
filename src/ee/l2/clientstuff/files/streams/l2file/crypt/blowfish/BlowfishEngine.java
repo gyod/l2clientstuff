@@ -339,7 +339,7 @@ public class BlowfishEngine {
 
     private void setKey(byte[] key) {
         /*
-		 * - comments are from _Applied Crypto_, Schneier, p338 please be
+         * - comments are from _Applied Crypto_, Schneier, p338 please be
 		 * careful comparing the two, AC numbers the arrays from 1, the
 		 * enclosed code from 0.
 		 *
@@ -351,7 +351,7 @@ public class BlowfishEngine {
         System.arraycopy(KS2, 0, S2, 0, SBOX_SK);
         System.arraycopy(KS3, 0, S3, 0, SBOX_SK);
         System.arraycopy(KP, 0, P, 0, P_SZ);
-		/*
+        /*
 		 * (2) Now, XOR P[0] with the first 32 bits of the key, XOR P[1] with
 		 * the second 32-bits of the key, and so on for all bits of the key (up
 		 * to P[17]). Repeatedly cycle through the key bits until the entire

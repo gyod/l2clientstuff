@@ -22,15 +22,16 @@ import java.util.Objects;
 /**
  * @author acmi
  */
-public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
-    private static int bufferSizeIncrement = 0x1000000;  //16MB
+public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream {
+    private static final int BUFFER_SIZE_INCREMENT = 0x1000000;  //16MB
 
-    private ByteBuffer buffer = ByteBuffer.allocate(bufferSizeIncrement);
+    private ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE_INCREMENT);
+
     {
         buffer.limit(0);
     }
 
-    public BufferedRandomAccessOutputStream(OutputStream output){
+    public BufferedRandomAccessOutputStream(OutputStream output) {
         super(Objects.requireNonNull(output));
     }
 
@@ -47,15 +48,15 @@ public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
         if (buffer == null)
             throw new IOException("Stream closed");
 
-        if (buffer.limit() < pos){
+        if (buffer.limit() < pos) {
             buffer.position(buffer.limit());
 
             write(new byte[pos - buffer.position()]);
         }
 
-        try{
+        try {
             buffer.position(pos);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new IOException(e);
         }
     }
@@ -65,17 +66,17 @@ public class BufferedRandomAccessOutputStream extends RandomAccessOutputStream{
         if (buffer == null)
             throw new IOException("Stream closed");
 
-        if (buffer.position() == buffer.capacity()){
-            ByteBuffer newBuffer = ByteBuffer.allocate(buffer.capacity()+bufferSizeIncrement);
+        if (buffer.position() == buffer.capacity()) {
+            ByteBuffer newBuffer = ByteBuffer.allocate(buffer.capacity() + BUFFER_SIZE_INCREMENT);
             newBuffer.put(buffer.array());
             newBuffer.limit(buffer.position());
             buffer = newBuffer;
         }
 
         if (buffer.position() == buffer.limit())
-            buffer.limit(buffer.limit()+1);
+            buffer.limit(buffer.limit() + 1);
 
-        buffer.put((byte)b);
+        buffer.put((byte) b);
     }
 
     @Override

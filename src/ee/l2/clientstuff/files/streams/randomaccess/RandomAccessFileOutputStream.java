@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * @author acmi
  */
-public class RandomAccessFileOutputStream extends RandomAccessOutputStream{
+public class RandomAccessFileOutputStream extends RandomAccessOutputStream {
     private RandomAccessFile file;
 
     public RandomAccessFileOutputStream(File file) throws FileNotFoundException {
@@ -32,13 +32,13 @@ public class RandomAccessFileOutputStream extends RandomAccessOutputStream{
         this.file = new RandomAccessFile(Objects.requireNonNull(file), "rw");
     }
 
-    public RandomAccessFileOutputStream(String name) throws FileNotFoundException{
+    public RandomAccessFileOutputStream(String name) throws FileNotFoundException {
         this(new File(Objects.requireNonNull(name)));
     }
 
     @Override
-    public int position() throws IOException{
-        return (int)file.getFilePointer();
+    public int position() throws IOException {
+        return (int) file.getFilePointer();
     }
 
     @Override
@@ -62,7 +62,8 @@ public class RandomAccessFileOutputStream extends RandomAccessOutputStream{
     }
 
     @Override
-    public void flush() throws IOException {}
+    public void flush() throws IOException {
+    }
 
     @Override
     public void close() throws IOException {

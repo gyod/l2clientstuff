@@ -14,8 +14,13 @@
  */
 package ee.l2.clientstuff.files.streams.l2data;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.DataOutput;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 /**
@@ -71,10 +76,10 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
         boolean negative = v < 0;
         v = Math.abs(v);
         int[] bytes = new int[]{
-                (v                 ) & 0b00111111,
-                (v >>             6) & 0b01111111,
-                (v >>         6 + 7) & 0b01111111,
-                (v >>     6 + 7 + 7) & 0b01111111,
+                (v) & 0b00111111,
+                (v >> 6) & 0b01111111,
+                (v >> 6 + 7) & 0b01111111,
+                (v >> 6 + 7 + 7) & 0b01111111,
                 (v >> 6 + 7 + 7 + 7) & 0b01111111
         };
 
@@ -82,13 +87,13 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
 
         for (int i = 0; i < 5; i++) {
             boolean hasMore = false;
-            for (int j=i+1; j<5; j++)
+            for (int j = i + 1; j < 5; j++)
                 if (bytes[j] != 0)
                     hasMore = true;
-            if (hasMore){
+            if (hasMore) {
                 bytes[i] |= i == 0 ? 0b01000000 : 0b10000000;
                 write(bytes[i]);
-            }else{
+            } else {
                 write(bytes[i]);
                 return;
             }
@@ -97,8 +102,8 @@ public class L2DataOutputStream extends FilterOutputStream implements DataOutput
 
     @Override
     public void writeLong(long v) throws IOException {
-        write((int) (v       ) & 0xFF);
-        write((int) (v >>>  8) & 0xFF);
+        write((int) (v) & 0xFF);
+        write((int) (v >>> 8) & 0xFF);
         write((int) (v >>> 16) & 0xFF);
         write((int) (v >>> 24) & 0xFF);
         write((int) (v >>> 32) & 0xFF);

@@ -74,13 +74,13 @@ public interface L2Ver41x {
                     "707af1d2108881abb567c3b3d069ae67" +
                     "c3a4c6a3aa93d26413d4c66094ae2039", 16);
     public final static BigInteger PUBLIC_EXPONENT_L2ENCDEC = new BigInteger(
-            "30b4c2d798d47086145c75063c8e841e"+
-                    "719776e400291d7838d3e6c4405b504c"+
-                    "6a07f8fca27f32b86643d2649d1d5f12"+
-                    "4cdd0bf272f0909dd7352fe10a77b34d"+
-                    "831043d9ae541f8263c6fe3d1c14c2f0"+
-                    "4e43a7253a6dda9a8c1562cbd493c1b6"+
-                    "31a1957618ad5dfe5ca28553f746e2fc"+
+            "30b4c2d798d47086145c75063c8e841e" +
+                    "719776e400291d7838d3e6c4405b504c" +
+                    "6a07f8fca27f32b86643d2649d1d5f12" +
+                    "4cdd0bf272f0909dd7352fe10a77b34d" +
+                    "831043d9ae541f8263c6fe3d1c14c2f0" +
+                    "4e43a7253a6dda9a8c1562cbd493c1b6" +
+                    "31a1957618ad5dfe5ca28553f746e2fc" +
                     "6f2db816c7db223ec91e955081c1de65", 16);
     public final static BigInteger PRIVATE_EXPONENT_L2ENCDEC = new BigInteger("1d", 16);
 }

@@ -32,11 +32,11 @@ public class StringSource extends SimpleJavaFileObject {
         this.code = code;
     }
 
-    public String getClassName(){
+    public String getClassName() {
         return className;
     }
 
-    public String getCode(){
+    public String getCode() {
         return code;
     }
 
@@ -47,6 +47,6 @@ public class StringSource extends SimpleJavaFileObject {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName()+"["+className+"]";
+        return getClass().getSimpleName() + "[" + className + "]";
     }
 }

@@ -16,7 +16,10 @@ package ee.l2.clientstuff.files.streams.l2file.crypt.rsa;
 
 import ee.l2.clientstuff.files.streams.FinishableOutputStream;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
@@ -25,12 +28,12 @@ import java.util.zip.DeflaterOutputStream;
 /**
  * @author acmi
  */
-public class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ver41x{
+public class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ver41x {
     private ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream(0);
 
     private boolean finished;
 
-    public L2Ver41xOutputStream(OutputStream output, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException{
+    public L2Ver41xOutputStream(OutputStream output, BigInteger modulus, BigInteger exponent) throws GeneralSecurityException {
         super(new RSAOutputStream(Objects.requireNonNull(output), modulus, exponent));
     }
 
@@ -55,6 +58,6 @@ public class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ve
         dataBuffer.writeTo(deflaterOutputStream);
         deflaterOutputStream.finish();
 
-        ((RSAOutputStream)out).finish();
+        ((RSAOutputStream) out).finish();
     }
 }

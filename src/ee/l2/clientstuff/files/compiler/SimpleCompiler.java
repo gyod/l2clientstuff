@@ -15,7 +15,10 @@
 package ee.l2.clientstuff.files.compiler;
 
 import javax.tools.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -34,14 +37,11 @@ public class SimpleCompiler {
         outputFolder.mkdir();
     }
 
-    public void compile(Iterable<JavaFileObject> sources) throws IOException{
+    public void compile(Iterable<JavaFileObject> sources) throws IOException {
         JavaFileManager fileManager = compiler.getStandardFileManager(null, Locale.getDefault(), null);
-        Iterable<? extends JavaFileObject> compilationUnits = sources;
-        Iterable<String> options = Arrays.asList(new String[]{
-                "-d", outputFolder.getAbsolutePath()
-        });
+        Iterable<String> options = Arrays.asList("-d", outputFolder.getAbsolutePath());
         DiagnosticCollector diagnosticListener = new DiagnosticCollector();
-        JavaCompiler.CompilationTask compilerTask = compiler.getTask(null, fileManager, diagnosticListener, options, null, compilationUnits);
+        JavaCompiler.CompilationTask compilerTask = compiler.getTask(null, fileManager, diagnosticListener, options, null, sources);
         boolean status = compilerTask.call();
         if (!status) {
             for (Iterator<Diagnostic> it = diagnosticListener.getDiagnostics().iterator(); it.hasNext(); ) {
@@ -60,11 +60,11 @@ public class SimpleCompiler {
 
     private void find(File inputFolder, int n, Collection<JavaFileObject> col) throws IOException {
         for (File file : inputFolder.listFiles()) {
-            if (file.isDirectory()){
+            if (file.isDirectory()) {
                 find(file, n, col);
-            }else if (file.getName().endsWith(".java")){
+            } else if (file.getName().endsWith(".java")) {
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                    String packageName = file.getParent().substring(n).replaceAll("\\"+File.separator, ".");
+                    String packageName = file.getParent().substring(n).replaceAll("\\" + File.separator, ".");
                     boolean datClass = false;
                     String className = null;
                     StringBuilder code = null;
@@ -83,7 +83,7 @@ public class SimpleCompiler {
                             className = "";
                             code = new StringBuilder();
                             if (!packageName.isEmpty())
-                                code.append("package " + packageName + ";\n\n");
+                                code.append("package ").append(packageName).append(";\n\n");
                             code.append("import ee.l2.clientstuff.files.*;\n");
                             code.append("import ee.l2.clientstuff.files.dat.*;\n");
                             code.append("import javax.xml.bind.annotation.*;\n");
@@ -119,7 +119,7 @@ public class SimpleCompiler {
                         }
                     }
                 } catch (IOException e) {
-                    System.err.println(e.getClass()+": "+e.getMessage());
+                    System.err.println(e.getClass() + ": " + e.getMessage());
                 }
             }
         }

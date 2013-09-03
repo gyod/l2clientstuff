@@ -16,13 +16,12 @@ package ee.l2.clientstuff.files.streams.randomaccess;
 
 import ee.l2.clientstuff.files.streams.FinishableOutputStream;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
  * @author acmi
  */
-public abstract class RandomAccessOutputStream extends FinishableOutputStream implements RandomAccess{
+public abstract class RandomAccessOutputStream extends FinishableOutputStream implements RandomAccess {
 
     /**
      * Creates an output stream filter built on top of the specified

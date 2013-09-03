@@ -14,12 +14,14 @@
  */
 package ee.l2.clientstuff.files.streams;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author acmi
  */
-public abstract class FinishableOutputStream extends FilterOutputStream{
+public abstract class FinishableOutputStream extends FilterOutputStream {
     /**
      * Creates an output stream filter built on top of the specified
      * underlying output stream.
@@ -36,25 +38,27 @@ public abstract class FinishableOutputStream extends FilterOutputStream{
     /**
      * Finishes writing and flushes data to the output stream without closing
      * the underlying stream.
+     *
      * @throws IOException if an I/O error has occurred
      */
-    public void finish() throws IOException{}
+    public void finish() throws IOException {
+    }
 
     /**
      * Closes this output stream and releases any system resources
      * associated with this stream. The general contract of <code>close</code>
      * is that it closes the output stream. A closed stream cannot perform
      * output operations and cannot be reopened.
-     * <p>
+     * <p/>
      * The <code>close</code> method of <code>FinishableOutputStream</code> call <code>finish</code> method.
      *
-     * @throws  IOException  if an I/O error occurs.
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public void close() throws IOException {
-        try{
+        try {
             finish();
-        }finally{
+        } finally {
             out.close();
         }
     }

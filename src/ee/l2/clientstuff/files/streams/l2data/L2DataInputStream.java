@@ -15,7 +15,9 @@
 package ee.l2.clientstuff.files.streams.l2data;
 
 import java.io.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
 import java.util.Objects;
 

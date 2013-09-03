@@ -32,7 +32,7 @@ public class L2Ver41xInputStream extends InputStream implements L2Ver41x {
     private int size;
     private int got;
 
-    public L2Ver41xInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws IOException,GeneralSecurityException {
+    public L2Ver41xInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws IOException, GeneralSecurityException {
         RSAInputStream rsaInputStream = new RSAInputStream(Objects.requireNonNull(input), modulus, exponent);
 
         DataInputStream dataInputStream = new DataInputStream(rsaInputStream);

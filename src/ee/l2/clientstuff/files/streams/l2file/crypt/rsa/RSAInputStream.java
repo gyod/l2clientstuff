@@ -34,6 +34,7 @@ public class RSAInputStream extends InputStream {
 
     private byte[] readBuffer = new byte[128];
     private ByteBuffer dataBuffer = ByteBuffer.allocate(124);
+
     {
         dataBuffer.position(dataBuffer.limit());
     }

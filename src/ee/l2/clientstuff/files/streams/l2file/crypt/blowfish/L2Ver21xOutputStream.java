@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * @author acmi
  */
-public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ver21x{
+public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ver21x {
     private BlowfishEngine blowfish = new BlowfishEngine();
 
     private byte[] writeBuffer = new byte[8];
@@ -66,7 +66,7 @@ public class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ve
         if (dataBuffer.position() == 0)
             return;
 
-        Arrays.fill(dataBuffer.array(), dataBuffer.position(), dataBuffer.limit(), (byte)0);
+        Arrays.fill(dataBuffer.array(), dataBuffer.position(), dataBuffer.limit(), (byte) 0);
         blowfish.processBlock(dataBuffer.array(), dataBuffer.arrayOffset(), writeBuffer, 0);
         write(writeBuffer);
     }

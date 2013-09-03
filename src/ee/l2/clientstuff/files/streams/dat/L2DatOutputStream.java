@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * @author acmi
  */
-public class L2DatOutputStream extends L2DataOutputStream{
+public class L2DatOutputStream extends L2DataOutputStream {
     public L2DatOutputStream(OutputStream out) {
         super(Objects.requireNonNull(out));
     }

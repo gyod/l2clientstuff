@@ -14,23 +14,26 @@
  */
 package ee.l2.clientstuff.files.streams.l2file.crypt.blowfish;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
  * @author acmi
  */
-public class L2Ver21xInputStream extends FilterInputStream implements L2Ver21x{
+public class L2Ver21xInputStream extends FilterInputStream implements L2Ver21x {
     private BlowfishEngine blowfish = new BlowfishEngine();
 
     private byte[] readBuffer = new byte[8];
     private ByteBuffer dataBuffer = ByteBuffer.allocate(8);
+
     {
         dataBuffer.position(dataBuffer.limit());
     }
 
-    public L2Ver21xInputStream(InputStream input, byte[] key){
+    public L2Ver21xInputStream(InputStream input, byte[] key) {
         super(Objects.requireNonNull(input));
 
         blowfish.init(false, Objects.requireNonNull(key, "key"));
@@ -50,10 +53,12 @@ public class L2Ver21xInputStream extends FilterInputStream implements L2Ver21x{
     }
 
     @Override
-    public synchronized void mark(int readlimit) {}
+    public synchronized void mark(int readlimit) {
+    }
 
     @Override
-    public synchronized void reset() throws IOException {}
+    public synchronized void reset() throws IOException {
+    }
 
     @Override
     public boolean markSupported() {

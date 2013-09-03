@@ -14,10 +14,10 @@
  */
 package ee.l2.clientstuff.files.streams.randomaccess;
 
-import java.io.*;
+import java.io.InputStream;
 
 /**
  * @author acmi
  */
-public abstract class RandomAccessInputStream extends InputStream implements RandomAccess{
+public abstract class RandomAccessInputStream extends InputStream implements RandomAccess {
 }

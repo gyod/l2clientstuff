@@ -7,5 +7,6 @@ import java.io.IOException;
  */
 public interface RandomAccess {
     public abstract int position() throws IOException;
+
     public abstract void seek(int pos) throws IOException;
 }

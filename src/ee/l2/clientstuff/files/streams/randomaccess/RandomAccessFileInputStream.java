@@ -14,7 +14,10 @@
  */
 package ee.l2.clientstuff.files.streams.randomaccess;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Objects;
 
 /**
@@ -23,17 +26,17 @@ import java.util.Objects;
 public class RandomAccessFileInputStream extends RandomAccessInputStream {
     private RandomAccessFile file;
 
-    public RandomAccessFileInputStream(File file) throws FileNotFoundException{
+    public RandomAccessFileInputStream(File file) throws FileNotFoundException {
         this.file = new RandomAccessFile(Objects.requireNonNull(file), "r");
     }
 
-    public RandomAccessFileInputStream(String name) throws FileNotFoundException{
+    public RandomAccessFileInputStream(String name) throws FileNotFoundException {
         this(new File(Objects.requireNonNull(name)));
     }
 
     @Override
     public int position() throws IOException {
-        return (int)file.getFilePointer();
+        return (int) file.getFilePointer();
     }
 
     @Override
@@ -53,7 +56,7 @@ public class RandomAccessFileInputStream extends RandomAccessInputStream {
 
     @Override
     public long skip(long n) throws IOException {
-        return file.skipBytes((int)n);
+        return file.skipBytes((int) n);
     }
 
     @Override

@@ -14,7 +14,10 @@
  */
 package ee.l2.clientstuff.files.streams.l2data;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author acmi
@@ -28,13 +31,14 @@ public @interface Length {
     public int value() default 0;
 
     /**
-     * @see LengthType
      * @return length representation type
+     * @see LengthType
      */
     public LengthType lengthType() default LengthType.INT;
 
     /**
      * Field which contains length. Can be Integer/int or array(same length).
+     *
      * @return field name
      */
     public String field() default "";

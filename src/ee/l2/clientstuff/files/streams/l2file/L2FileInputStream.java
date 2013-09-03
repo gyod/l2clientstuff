@@ -14,19 +14,26 @@
  */
 package ee.l2.clientstuff.files.streams.l2file;
 
-import ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.*;
-import ee.l2.clientstuff.files.streams.l2file.crypt.rsa.*;
-import ee.l2.clientstuff.files.streams.l2file.crypt.xor.*;
+import ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xInputStream;
+import ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xInputStream;
+import ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver120InputStream;
+import ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver1x1InputStream;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xInputStream.*;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xInputStream.BLOWFISH_KEY_211;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.blowfish.L2Ver21xInputStream.BLOWFISH_KEY_212;
 import static ee.l2.clientstuff.files.streams.l2file.crypt.rsa.L2Ver41xInputStream.*;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver1x1.XOR_KEY_111;
+import static ee.l2.clientstuff.files.streams.l2file.crypt.xor.L2Ver1x1.getXORKey121;
 
 /**
  * @author acmi
@@ -49,8 +56,8 @@ public class L2FileInputStream extends FilterInputStream {
             case 111:
             case 121:
                 return new L2Ver1x1InputStream(input, version == 111 ?
-                        L2Ver1x1.XOR_KEY_111 :
-                        L2Ver1x1.getXORKey121(name));
+                        XOR_KEY_111 :
+                        getXORKey121(name));
             case 120:
                 return new L2Ver120InputStream(input);
             //BLOWFISH
@@ -64,8 +71,8 @@ public class L2FileInputStream extends FilterInputStream {
             case 412:
             case 413:
             case 414:
-                BigInteger modulus = l2encdec ? MODULUS_L2ENCDEC : RSA_KEYS[version-411][0];
-                BigInteger exponent = l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : RSA_KEYS[version-411][1];
+                BigInteger modulus = l2encdec ? MODULUS_L2ENCDEC : RSA_KEYS[version - 411][0];
+                BigInteger exponent = l2encdec ? PRIVATE_EXPONENT_L2ENCDEC : RSA_KEYS[version - 411][1];
                 try {
                     return new L2Ver41xInputStream(input, modulus, exponent);
                 } catch (GeneralSecurityException e) {
@@ -78,7 +85,7 @@ public class L2FileInputStream extends FilterInputStream {
 
     public static int readVersion(InputStream input) throws IOException {
         byte[] header = new byte[28];
-        input.read(header);
+        new DataInputStream(input).readFully(header);
         String headerStr = new String(header, Charset.forName("utf-16le"));
         if (!Pattern.compile("Lineage2Ver\\d{3}").matcher(headerStr).matches())
             throw new IOException("Not a Lineage 2 file");
