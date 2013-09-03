@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="200.0" prefWidth="360.0" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/2.2" fx:controller="ee.l2.clientstuff.l2tool.L2Tool">
+    <children>
+        <GridPane alignment="CENTER" hgap="2.0" vgap="0.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
+                  AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+            <children>
+                <Label minHeight="-Infinity" minWidth="-Infinity" text="L2" GridPane.columnIndex="0"
+                       GridPane.halignment="CENTER" GridPane.rowIndex="0"/>
+                <TextField fx:id="originalFilePath" editable="false" maxWidth="1.7976931348623157E308"
+                           prefColumnCount="12" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openOriginalFile" text=".."
+                        GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <HBox id="HBox" fx:id="cryptParams" alignment="CENTER" spacing="5.0" GridPane.columnIndex="0"
+                      GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="1">
+                    <children>
+                        <Label text="Ver"/>
+                        <ComboBox fx:id="cryptVersionCB"/>
+                        <Label text="Key" wrapText="false"/>
+                        <TextField fx:id="cryptKeyTF" prefWidth="-1.0" promptText="file name for 121"/>
+                    </children>
+                </HBox>
+                <Button fx:id="crypt" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#processFile"
+                        text="enc" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"/>
+                <Separator prefWidth="-1.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647"
+                           GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"
+                           GridPane.valignment="CENTER"/>
+                <Label prefWidth="-1.0" text="dds" GridPane.columnIndex="0" GridPane.halignment="CENTER"
+                       GridPane.rowIndex="3"/>
+                <TextField fx:id="ddsPath" editable="false" prefWidth="200.0" GridPane.columnIndex="1"
+                           GridPane.rowIndex="3"/>
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectDDS" text=".."
+                        GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                <Label text="utx" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.rowIndex="4"/>
+                <TextField fx:id="utxPath" editable="false" prefWidth="200.0" GridPane.columnIndex="1"
+                           GridPane.rowIndex="4"/>
+                <Button maxHeight="-1.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectUTX"
+                        text=".." GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4"/>
+                <HBox alignment="CENTER" disable="false" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0"
+                      GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5"
+                      GridPane.valignment="CENTER">
+                    <children>
+                        <RadioButton fx:id="c0" disable="false" mnemonicParsing="false" text="C0-CT0"/>
+                        <RadioButton fx:id="ct1" disable="false" mnemonicParsing="false" text="CT1-CT2.2"/>
+                        <RadioButton fx:id="ct23" disable="false" mnemonicParsing="false" text="CT2.3+"/>
+                    </children>
+                </HBox>
+                <HBox id="HBox" alignment="CENTER" spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                    <children>
+                        <ComboBox fx:id="textures" disable="false" maxWidth="1.7976931348623157E308" prefHeight="-1.0"
+                                  prefWidth="-1.0" HBox.hgrow="ALWAYS"/>
+                        <Button cancelButton="false" defaultButton="false" disable="false" mnemonicParsing="false"
+                                onAction="#showUTXTree" text=".."/>
+                    </children>
+                </HBox>
+                <Button fx:id="replaceTexture" disable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#replaceTexture" text="set" GridPane.columnIndex="2" GridPane.rowIndex="6"/>
+                <Button alignment="TOP_LEFT" contentDisplay="LEFT" disable="false" mnemonicParsing="false"
+                        onAction="#convertToUnrealED" text="L2 -&gt; UnreadED" GridPane.columnIndex="1"
+                        GridPane.columnSpan="2147483647" GridPane.halignment="RIGHT" GridPane.rowIndex="7"/>
+                <ProgressIndicator fx:id="encdecProgress" prefHeight="-1.0" prefWidth="-1.0" progress="-1.0"
+                                   GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS"
+                                   GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS"/>
+            </children>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="24.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="293.0" minWidth="10.0" prefWidth="279.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="40.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+                <RowConstraints fillHeight="false" maxHeight="-1.0" minHeight="-Infinity" prefHeight="-1.0"
+                                valignment="CENTER" vgrow="NEVER"/>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="30.0" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+        </GridPane>
+    </children>
+</AnchorPane>
