@@ -14,28 +14,11 @@
  */
 package ee.l2.clientstuff.files.up;
 
-import java.util.List;
-import java.util.UUID;
-
 /**
  * @author acmi
  */
-public interface L2UnrealPackage {
-    static final int L2_UNREAL_PACKAGE_MAGIC = 0x9e2a83c1;
-
-    int getVersion();
-
-    int getLicense();
+public interface NameEntry {
+    String getName();
 
     int getFlags();
-
-    List<? extends NameEntry> getNameTable();
-
-    List<? extends ExportEntry> getExportTable();
-
-    List<? extends ImportEntry> getImportTable();
-
-    UUID getUUID();
-
-    List<? extends Generation> getGenerations();
 }
